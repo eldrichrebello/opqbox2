@@ -10,9 +10,7 @@
 import dbus
 import time
 
-
-
-if __name__ == "__main__":
+def get_ssids():
     bus = dbus.SystemBus()
     manager_bus_object = bus.get_object("org.freedesktop.NetworkManager",
                                         "/org/freedesktop/NetworkManager")
@@ -34,6 +32,7 @@ if __name__ == "__main__":
     accesspoints_paths_list = device.GetAccessPoints()
 
     our_ap_path = None
+    ssids = []
     for ap_path in accesspoints_paths_list:
         ap_props = dbus.Interface(
             bus.get_object("org.freedesktop.NetworkManager", ap_path),
@@ -51,8 +50,13 @@ if __name__ == "__main__":
         # string.
         str_ap_ssid = "".join(chr(i) for i in ap_ssid)
         if security == 0:
+	    ssids.append((str_ap_ssid, "NONE", ap_strength))
             print "SSID = ", str_ap_ssid , " Security = NONE ", ap_strength , "%" 
         elif security & (0x1 | 0x2 | 0x10 | 0x20):
+            ssids.append((str_ap_ssid, "WEP", ap_strength))
             print "SSID = ", str_ap_ssid , " Security = WEP", ap_strength , "%" 
         else:
-            print "SSID = ", str_ap_ssid , " Security = WPA", ap_strength , "%" 
+            ssids.append((str_ap_ssid, "WPA", ap_strength))
+            print "SSID = ", str_ap_ssid , " Security = WPA", ap_strength , "%"
+
+     return ssids 

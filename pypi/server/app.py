@@ -5,17 +5,17 @@ from net import get_ssids
 
 @route('/js/<filename>')
 def js_static(filename):
-    return static_file(filename, root='./js')
+    return static_file(filename, root='/home/pi/opqbox2/pypi/server/js')
 
 
 @route('/img/<filename>')
 def img_static(filename):
-    return static_file(filename, root='./img')
+    return static_file(filename, root='/home/pi/opqbox2/pypi/server/img')
 
 
 @route('/css/<filename>')
 def img_static(filename):
-    return static_file(filename, root='./css')
+    return static_file(filename, root='/home/pi/opqbox2/pypi/server/css')
 
 
 @route("/")
