@@ -20,7 +20,7 @@ def img_static(filename):
 
 @route("/")
 def hello():
-    return template('networks.tpl', ssids=[("a", "b"), ("c", "d")])
+    return template('/home/pi/opqbox2/pypi/server/views/networks.tpl', ssids=get_ssids())
 
 
 def run_server(host='0.0.0.0', port=5000):

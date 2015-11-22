@@ -2,7 +2,7 @@
 <html lang="en">
 
 %from random import randint
-%from __init__ import connect_to_network
+%from net import connect_to_network
 
   <head>
     <meta charset="utf-8">

@@ -2,7 +2,7 @@ import logging
 import threading
 import net
 
-from bottle import app as server
+from server import app as server
 
 logger = logging.getLogger(__name__)
 
