@@ -44,8 +44,10 @@ class BottleTask(threading.Thread):
 
     def run(self):
         logger.debug("BottleTask started")
-        server.run_server(5000)
+        server.run_server("0.0.0.0", 5000)
+
         while not self.stopped.wait(self.delay):
+            #shutdown()
             pass
 
         logger.debig("BottleTask stopped")

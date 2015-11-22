@@ -1,8 +1,6 @@
-#!/usr/bin/env python
-
 import os
 from bottle import route, run, static_file, template
-from __init__ import get_ssids
+from net import get_ssids
 
 
 @route('/js/<filename>')
@@ -22,9 +20,9 @@ def img_static(filename):
 
 @route("/")
 def hello():
-    return template('main1.tpl', List1=get_ssids())
+    return template('networks.tpl', ssids=[("a", "b"), ("c", "d")])
 
 
-def run_server(port=5000):
+def run_server(host='0.0.0.0', port=5000):
     port = int(os.environ.get("PORT", port))
-    run(host='localhost', port=port)
+    run(host=host, port=port)

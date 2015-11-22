@@ -32,11 +32,11 @@
     </thead>
     <tbody>
 
-%y = len(List1)
+%y = len(ssids)
 %input=[]
 %for i in range(y):
     %input.append(1)
-    %input[i] = List1[i]
+    %input[i] = ssids[i]
 %end  
 %for i in range(y):
       <tr id = tableRow data-toggle="modal" data-ssid="{{input[i][0]}}" data-target="#{{input[i][1]}}">

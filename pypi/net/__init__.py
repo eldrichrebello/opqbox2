@@ -12,7 +12,7 @@ def get_ssids():
     for dev in NetworkManager.NetworkManager.GetDevices():
         if dev.DeviceType != NetworkManager.NM_DEVICE_TYPE_WIFI:
             continue
-        return map(lambda ap: ap.Ssid, dev.SpecificDevice().GetAccessPoints())
+        return map(lambda ap: (ap.Ssid, "wep"), dev.SpecificDevice().GetAccessPoints())
 
 
 def connect_hotspot():

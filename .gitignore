@@ -3,3 +3,5 @@
 */*.pyc
 pypi/.idea
 pypi/**.pyc
+**.pyc
+*.pyc

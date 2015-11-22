@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import logging
 import net
 from tasks import Tasks
@@ -23,11 +25,12 @@ if __name__ == "__main__":
     for task in tasks:
         task.start()
 
-    def any_alive():
+    def find_alive():
+        alive = []
         for task in tasks:
             if task.isAlive():
-                return True
-        return False
+                alive.append(task)
+        return alive
 
     while True:
         sys.stdout.write("pypid # ")
@@ -36,8 +39,8 @@ if __name__ == "__main__":
             logger.info("Killing tasks")
             stop_event.set()
 
-            while any_alive():
-                logger.info("Waiting for all threads to die...")
+            while len(find_alive()) > 0:
+                logger.info("Waiting for all threads to die... " + str(find_alive()))
                 time.sleep(2)
 
             logger.info("Goodbye")
