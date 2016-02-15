@@ -1,3 +1,4 @@
+import NetworkManager
 import logging
 import urllib2
 
@@ -6,15 +7,10 @@ logger = logging.getLogger(__name__)
 
 def get_ssids():
     logger.debug("Retrieving SSIDs")
-    return [
-        ("CSLD", "WEP"),
-        ("network1", "OPEN"),
-        ("fedz Only", "WPA"),
-        ("free doughnuts", "WPA"),
-        ("Linksys", "OPEN"),
-        ("Cisco", "OPEN"),
-        ("HP Printer #308", "WEP")
-    ]
+    for dev in NetworkManager.NetworkManager.GetDevices():
+        if dev.DeviceType != NetworkManager.NM_DEVICE_TYPE_WIFI:
+            continue
+        return map(lambda ap: ap.Ssid, dev.SpecificDevice().GetAccessPoints())
 
 
 def connect_hotspot():
@@ -41,3 +37,6 @@ def check_connection():
     except urllib2.URLError as err:
         pass
     return False
+
+if __name__ == "__main__":
+    print get_ssids()
