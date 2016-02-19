@@ -1,2 +1,5 @@
 .gradle/
 *.swp
+*/*.pyc
+pypi/.idea
+pypi/**.pyc
