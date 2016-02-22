@@ -16,6 +16,7 @@ def get_ssids():
 
 
 def connect_hotspot():
+    logger.debug("Connecting as hotspot")
     ap.connect_hotspot(True)
 
 
