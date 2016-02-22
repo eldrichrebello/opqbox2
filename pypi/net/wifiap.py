@@ -54,59 +54,50 @@ con = dbus.Dictionary({
     'ipv6': s_ip6
      })
 
-def usage():	
-    print "Usage: %s <ifname> [up|down]" % sys.argv[0]
-    sys.exit(0)
-
 bus = dbus.SystemBus()
 service_name = "org.freedesktop.NetworkManager"
 proxy = bus.get_object(service_name, "/org/freedesktop/NetworkManager/Settings")
 settings = dbus.Interface(proxy, "org.freedesktop.NetworkManager.Settings")
 
-if len(sys.argv) != 3:
-    usage()
+def connect_hotspot(up=True, iface="wlan0"):
+    iface = iface
+    proxy = bus.get_object(service_name, "/org/freedesktop/NetworkManager")
+    nm = dbus.Interface(proxy, "org.freedesktop.NetworkManager")
+    devpath = nm.GetDeviceByIpIface(iface)
 
-iface = sys.argv[1]
-proxy = bus.get_object(service_name, "/org/freedesktop/NetworkManager")
-nm = dbus.Interface(proxy, "org.freedesktop.NetworkManager")
-devpath = nm.GetDeviceByIpIface(iface)
+    # Find our existing hotspot connection
+    connection_path = None
+    for path in settings.ListConnections():
+        proxy = bus.get_object(service_name, path)
+        settings_connection = dbus.Interface(proxy, "org.freedesktop.NetworkManager.Settings.Connection")
+        config = settings_connection.GetSettings()
+        if config['connection']['uuid'] == our_uuid:
+            connection_path = path
+            break
 
-# Find our existing hotspot connection
-connection_path = None
-for path in settings.ListConnections():
-    proxy = bus.get_object(service_name, path)
-    settings_connection = dbus.Interface(proxy, "org.freedesktop.NetworkManager.Settings.Connection")
-    config = settings_connection.GetSettings()
-    if config['connection']['uuid'] == our_uuid:
-        connection_path = path
-        break
+    # If the hotspot connection didn't already exist, add it
+    if not connection_path:
+        connection_path = settings.AddConnection(con)
 
-# If the hotspot connection didn't already exist, add it
-if not connection_path:
-    connection_path = settings.AddConnection(con)
+    # Now start or stop the hotspot on the requested device
+    proxy = bus.get_object(service_name, devpath)
+    device = dbus.Interface(proxy, "org.freedesktop.NetworkManager.Device")
+    operation = "up" if up else "down"
+    if operation == "up":
+        acpath = nm.ActivateConnection(connection_path, devpath, "/")
+        proxy = bus.get_object(service_name, acpath)
+        active_props = dbus.Interface(proxy, "org.freedesktop.DBus.Properties")
 
-# Now start or stop the hotspot on the requested device
-proxy = bus.get_object(service_name, devpath)
-device = dbus.Interface(proxy, "org.freedesktop.NetworkManager.Device")
-operation = sys.argv[2]
-if operation == "up":
-    acpath = nm.ActivateConnection(connection_path, devpath, "/")
-    proxy = bus.get_object(service_name, acpath)
-    active_props = dbus.Interface(proxy, "org.freedesktop.DBus.Properties")
+        # Wait for the hotspot to start up
+        start = time.time()
+        while time.time() < start + 10:
+            state = active_props.Get("org.freedesktop.NetworkManager.Connection.Active", "State")
+            if state == 2:  # NM_ACTIVE_CONNECTION_STATE_ACTIVATED
+                print "Access point started"
+                return
+            time.sleep(1)
+        print "Failed to start access point"
+    elif operation == "down":
+        device.Disconnect()
 
-    # Wait for the hotspot to start up
-    start = time.time()
-    while time.time() < start + 10:
-        state = active_props.Get("org.freedesktop.NetworkManager.Connection.Active", "State")
-        if state == 2:  # NM_ACTIVE_CONNECTION_STATE_ACTIVATED
-            print "Access point started"
-            sys.exit(0)
-        time.sleep(1)
-    print "Failed to start access point"
-elif operation == "down":
-    device.Disconnect()
-else:
-    usage()
-
-sys.exit(0)
 

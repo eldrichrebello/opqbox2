@@ -2,6 +2,8 @@ import NetworkManager
 import logging
 import urllib2
 
+import wifiap as ap
+
 logger = logging.getLogger(__name__)
 
 
@@ -14,11 +16,12 @@ def get_ssids():
 
 
 def connect_hotspot():
-    logger.debug("Connecting as hotspot")
+    ap.connect_hotspot(True)
 
 
 def disconnect_hotspot():
     logger.debug("Disconnecting as hotspot")
+    ap.connect_hotspot(False)
 
 
 def connect_to_network(ssid, skey=None):
