@@ -2,8 +2,9 @@ import logging
 import threading
 import net
 
-logger = logging.getLogger(__name__)
+from bottle import app as server
 
+logger = logging.getLogger(__name__)
 
 class NetworkConnectionTask(threading.Thread):
     def __init__(self, event, delay):
@@ -20,7 +21,6 @@ class NetworkConnectionTask(threading.Thread):
         logger.debug("NetworkConnectionTask stopped")
 
 
-
 class SsidTask(threading.Thread):
     def __init__(self, event, delay):
         super(SsidTask, self).__init__()
@@ -34,3 +34,18 @@ class SsidTask(threading.Thread):
             # Update SSID list
 
         logger.debug("SsisTask stopped")
+
+
+class BottleTask(threading.Thread):
+    def __init__(self, event, delay):
+        super(BottleTask, self).__init__()
+        self.stopped = event
+        self.delay = delay
+
+    def run(self):
+        logger.debug("BottleTask started")
+        server.run_server(5000)
+        while not self.stopped.wait(self.delay):
+            pass
+
+        logger.debig("BottleTask stopped")

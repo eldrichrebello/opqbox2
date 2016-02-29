@@ -11,25 +11,32 @@ if __name__ == "__main__":
     # Setup logging
     logging.basicConfig(format='%(asctime)s -- %(levelname)s:%(name)s/%(filename)s.%(funcName)s[%(lineno)d]:%(message)s', level=logging.DEBUG)
 
-    # Fire up the internet connection task
-    conn_task_stopped = Event()
-    conn_task = Tasks.NetworkConnectionTask(conn_task_stopped, 5)
-    conn_task.start()
+    # Event to kill threads
+    stop_event = Event()
 
-    # Fire up SSID tast
-    ssid_task_stopped = Event()
-    ssid_task = Tasks.SsidTask(ssid_task_stopped, 20)
-    ssid_task.start()
+    conn_task = Tasks.NetworkConnectionTask(stop_event, 5)
+    ssid_task = Tasks.SsidTask(stop_event, 20)
+    bottle_task = Tasks.BottleTask(stop_event, 20)
+
+    tasks = [conn_task, ssid_task, bottle_task]
+
+    for task in tasks:
+        task.start()
+
+    def any_alive():
+        for task in tasks:
+            if task.isAlive():
+                return True
+        return False
 
     while True:
         sys.stdout.write("pypid # ")
         c = raw_input()
         if c == "q":
             logger.info("Killing tasks")
-            conn_task_stopped.set()
-            ssid_task_stopped.set()
+            stop_event.set()
 
-            while conn_task.isAlive() or ssid_task.isAlive():
+            while any_alive():
                 logger.info("Waiting for all threads to die...")
                 time.sleep(2)
 
