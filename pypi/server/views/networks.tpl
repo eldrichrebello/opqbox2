@@ -2,8 +2,6 @@
 <html lang="en">
 
 %from random import randint
-%from net import connect_to_network
-
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,17 +30,12 @@
     </thead>
     <tbody>
 
-%y = len(ssids)
-%input=[]
-%for i in range(y):
-    %input.append(1)
-    %input[i] = ssids[i]
-%end  
-%for i in range(y):
-      <tr id = tableRow data-toggle="modal" data-ssid="{{input[i][0]}}" data-target="#{{input[i][1]}}">
+%length_ssid = len(ssids)
+%for i in range(length_ssid):
+      <tr id = tableRow data-toggle="modal" data-target="#{{ssid[i][1]}}"  onclick="mSSID({{i}})">
         <td>{{i+1}}</td>
-        <td>{{input[i][0]}}</td>
-        <td>{{input[i][1]}}</td>
+        <td id= "tableCol_SSID{{i}}">{{ssid[i][0]}}</td>
+        <td id= "tableCol_type{{i}}">{{ssid[i][1]}}</td>
       </tr>
 %end
     </tbody>
@@ -50,55 +43,63 @@
 
 <!-- Modal -->
 
-  <div class="modal fade" id="WEP" role="dialog">
+<div class="modal fade" id="WEP" role="dialog">
     <div class="modal-dialog">
-    
+
       <!-- Modal content-->
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
           <h4 class="modal-title">Type the network security key</h4>
         </div>
+
+        <form action ="/" method="POST" >
         <div class="modal-body" >
-          <label for= "pwd">Security key:</label>
-          <input type="password" class="form-control" id="pwd">
+          <label for= "pwdWEP">Security key:</label>
+          <input type="password" class="form-control" id="pwdWEP" name="pwdWEP">
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal" onclick="resetFunction()">OK</button> 
-          <button type="button" class="btn btn-default" data-dismiss="modal" onclick="resetFunction()">Cancel</button>
-        </div>
+          <input name="fWEP" id="idWEP">
+          <input name="sub_WEP" type="submit" class="btn btn-default" value="Connect">
+          <input type="button" class="btn btn-default" data-dismiss="modal" onclick="resetFunction()" value ="Cancel">
+          </form>
+         </div>
       </div>
-      
     </div>
   </div>
 
 
   <div class="modal fade" id="WPA" role="dialog">
     <div class="modal-dialog">
-    
+
       <!-- Modal content-->
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
           <h4 class="modal-title">Type the network security key</h4>
         </div>
+
+        <form action ="/" method="POST" >
         <div class="modal-body">
-          <label for= "pwd1">Security key:</label>
-          <input type="password" class="form-control" id="pwd">
+          <label for= "pwdWPA">Security key:</label>
+          <input type="password" class="form-control" id="pwdWPA" name="pwdWPA">
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal" onclick="resetFunction()">OK</button> 
-          <button type="button" class="btn btn-default" data-dismiss="modal" onclick="resetFunction()">Cancel</button>
-        </div>
+
+          <input name="fWPA" id="idWPA">
+          <input name="sub_WPA" type="submit" class="btn btn-default" value="Connect">
+          <input type="button" class="btn btn-default" data-dismiss="modal" onclick="resetFunction()" value ="Cancel">
+          </form>
+        </div>-
       </div>
-      
+
     </div>
   </div>
 
 
   <div class="modal fade" id="OPEN" role="dialog">
     <div class="modal-dialog">
-    
+
       <!-- Modal content-->
       <div class="modal-content">
         <div class="modal-header">
@@ -108,8 +109,11 @@
         <div class="modal-body">
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal" onclick="resetFunction()">OK</button> 
-          <button type="button" class="btn btn-default" data-dismiss="modal" onclick="resetFunction()">Cancel</button>
+          <form action ="/" method="POST" >
+          <input name="fOPEN" id="idOPEN">
+          <input type="submit" name="sub_OPEN" value="Connect" class="btn btn-default">
+          <input type="button" class="btn btn-default" data-dismiss="modal" onclick="resetFunction()" value ="Cancel">
+          </form>
         </div>
       </div>
     </div>
@@ -124,13 +128,26 @@
     <!-- Placed at the end of the document so the pages load faster -->
 
       <script src="/js/jquery.min.js"></script>
-      <script src="/js/bootstrap.min.js"></script>
-      <script>
-      function resetFunction() {
-      document.getElementById("pwd").value = '';
-      document.getElementById("pwd1").value = '';
+
+
+       function resetFunction() {
+          document.getElementById("pwdWEP").value = '';
+          document.getElementById("pwdWPA").value = '';
         }
-        
+
+      function mSSID(indexSSID){
+
+          if(document.getElementById("tableCol_type"+indexSSID).innerHTML=='OPEN'){
+            document.getElementById("idOPEN").value = document.getElementById("tableCol_SSID"+indexSSID).innerHTML;
+            }
+          else if( document.getElementById("tableCol_type"+indexSSID).innerHTML== 'WPA'){
+            document.getElementById("idWPA").value = document.getElementById("tableCol_SSID"+indexSSID).innerHTML;
+            }
+          else if( document.getElementById("tableCol_type"+indexSSID).innerHTML == 'WEP'){
+            document.getElementById("idWEP").value = document.getElementById("tableCol_SSID"+indexSSID).innerHTML;
+            }
+       }
+
       </script>
 
   </body>
