@@ -1,2 +1,3 @@
 -Isrc/cmsis/headers
 -Isrc/stm_lib/headers
+-Wall

@@ -1,4 +1,7 @@
 apply plugin: 'c'
+apply plugin: 'cpp'
+
+defaultTasks 'opq'
 
 model {
     platforms {
@@ -13,9 +16,9 @@ model {
 
             eachPlatform { tools ->
                 tools.cCompiler.executable = 'arm-none-eabi-gcc'
-                tools.cppCompiler.executable = 'arm-none-eabi-g++'
-                tools.assembler.executable = 'arm-none-eabi-as'
-                tools.linker.executable = 'arm-none-eabi-ld'
+                tools.cppCompiler.executable = 'arm-none-eabi-gcc'
+                tools.assembler.executable = 'arm-none-eabi-gcc'
+                tools.linker.executable = 'arm-none-eabi-gcc'
             }
         }
     }
@@ -53,13 +56,13 @@ model {
 
         opq(NativeExecutableSpec) {
             sources {
-                c.lib library: 'cmsis', linkage: 'static'     
-                c.lib library: 'cmsis_boot', linkage: 'static'     
-                c.lib library: 'stm_lib', linkage: 'static'     
-
+                cpp.lib library: 'cmsis', linkage: 'static'     
+                cpp.lib library: 'cmsis_boot', linkage: 'static'     
+                cpp.lib library: 'stm_lib', linkage: 'static'     
             }
             binaries.all {
-                linker.args '-Tsrc/arm-gcc-link.ld', '-L/usr/arm-none-eabi/lib/fpu', '-lc', '-lm'
+                cCompiler.args '-flto'
+                cppCompiler.args '-flto'
             } 
         }
 
@@ -67,15 +70,30 @@ model {
             targetPlatform 'arm32'
 
             binaries.all { 
-                cCompiler.args '-mcpu=cortex-m4', 
+                def common = [
+                    '-mcpu=cortex-m4', 
+                    '-g',
                     '-mthumb',
                     '-mfpu=fpv4-sp-d16',
                     '-mfloat-abi=hard',
                     '-DSTM32F303VC', 
                     '-DSTM32F30X', 
                     '-D__FPU_USED',
-                    '-DUSE_STDPERIPH_DRIVER'
-            }
+                    '-DUSE_STDPERIPH_DRIVER',
+                    '-ffunction-sections', '-fdata-sections',
+                    '-Wl,--gc-sections'
+                ]
+
+                assembler.args(*common)
+                cCompiler.args(*common)
+                cppCompiler.args(*common, '--std=c++14')
+
+                linker.args(*common, 
+                    '-Tarm-gcc-link.ld', 
+                    '--specs=nosys.specs', '-lnosys',
+                    '-lc_nano', '-lg_nano', '-lstdc++_nano',
+                )
+           }
         }
     }
 }

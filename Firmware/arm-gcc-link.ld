@@ -1,4 +1,5 @@
 OUTPUT_FORMAT ("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
+ENTRY(Reset_Handler)
 /* Internal Memory Map*/
 MEMORY
 {
@@ -129,4 +130,4 @@ SECTIONS
 	
 	/* Check if data + heap + stack exceeds ram  limit */
 	ASSERT(__StackLimit >= __HeapLimit, "region ram  overflowed with stack")
-}
+}

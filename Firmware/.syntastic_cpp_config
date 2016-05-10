@@ -1,1 +1,4 @@
--Isrc/**/headers
+-Isrc/cmsis/headers
+-Isrc/stm_lib/headers
+-Wall
+--std=c++14
