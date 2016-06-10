@@ -97,3 +97,6 @@ include .depend
 .s.o:
 	@echo as $<
 	@$(AS) $(ASFLAGS) -c -o $@ $<
+
+deployToPy: opq.bin
+	scp opq.bin pi@192.168.1.136:~/soft/opqbox2/pypi/DSP/

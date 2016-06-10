@@ -32,6 +32,11 @@
   */
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f3xx_hal.h"
+#include "../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_tim.h"
+#include "../Drivers/CMSIS/Device/ST/STM32F3xx/Include/stm32f373xc.h"
+#include "../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_rcc.h"
+#include "../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_gpio.h"
+#include "../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_cortex.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -44,6 +49,8 @@ DMA_HandleTypeDef hdma_spi3_tx;
 
 UART_HandleTypeDef huart1;
 
+TIM_HandleTypeDef tim2;
+
 void SystemClock_Config(void);
 void Error_Handler(void);
 static void MX_GPIO_Init(void);
@@ -52,6 +59,8 @@ static void MX_SDADC1_Init(void);
 static void MX_SDADC2_Init(void);
 static void MX_SPI3_Init(void);
 static void MX_USART1_UART_Init(void);
+static void MX_TIM_INIT(void);
+
 
 int main(void)
 {
@@ -70,17 +79,14 @@ int main(void)
     MX_SDADC2_Init();
     MX_SPI3_Init();
     MX_USART1_UART_Init();
-
+    MX_TIM_INIT();
     while (1)
     {
- //           uint8_t c;
-   //         HAL_UART_Receive(&huart1, &c, 1, 0xFFFF);
-     //       HAL_UART_Transmit(&huart1, &c, 1, 0xFFFF);
-
+        uint32_t count = __HAL_TIM_GetCounter(&tim2);
 	    HAL_SDADC_Start(&hsdadc2);
         while (HAL_SDADC_PollForConversion(&hsdadc2, 100) != HAL_OK);
         int16_t value = (int16_t) HAL_SDADC_GetValue(&hsdadc2);
-	    sprintf(out, "%hd\r\n", value);
+	    sprintf(out, "%lu\r\n", count);
 	    int16_t len = strlen(out);
 	    HAL_UART_Transmit(&huart1, out, len, 0xFFFF);
     }
@@ -253,6 +259,19 @@ static void MX_USART1_UART_Init(void)
         Error_Handler();
     }
 
+}
+
+static void  MX_TIM_INIT(void)
+{
+    __HAL_RCC_TIM2_CLK_ENABLE();
+    /* Configure the timer in PWM mode */
+    tim2.Instance = TIM2;
+    tim2.Init.ClockDivision = 0;
+    tim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+    tim2.Init.Period = 4687; /* Freq = 72Mhz/65535 = 1.098 KHz */
+    tim2.Init.Prescaler = 0;
+    HAL_TIM_Base_Init(&tim2);
+    HAL_TIM_Base_Start(&tim2);
 }
 
 /**
