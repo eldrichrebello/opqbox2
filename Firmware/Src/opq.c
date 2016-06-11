@@ -32,71 +32,107 @@
   */
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f3xx_hal.h"
-#include "../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_tim.h"
-#include "../Drivers/CMSIS/Device/ST/STM32F3xx/Include/stm32f373xc.h"
-#include "../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_rcc.h"
-#include "../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_gpio.h"
-#include "../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_cortex.h"
 #include <stdio.h>
 #include <string.h>
 
-SDADC_HandleTypeDef hsdadc1;
+/* USER CODE BEGIN Includes */
+
+/* USER CODE END Includes */
+
+/* Private variables ---------------------------------------------------------*/
 SDADC_HandleTypeDef hsdadc2;
-DMA_HandleTypeDef hdma_sdadc2;
 
 SPI_HandleTypeDef hspi3;
-DMA_HandleTypeDef hdma_spi3_tx;
+
+TIM_HandleTypeDef htim2;
 
 UART_HandleTypeDef huart1;
 
-TIM_HandleTypeDef tim2;
+/* USER CODE BEGIN PV */
+/* Private variables ---------------------------------------------------------*/
 
+/* USER CODE END PV */
+
+/* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+
 void Error_Handler(void);
+
 static void MX_GPIO_Init(void);
-static void MX_DMA_Init(void);
-static void MX_SDADC1_Init(void);
+
 static void MX_SDADC2_Init(void);
+
 static void MX_SPI3_Init(void);
+
 static void MX_USART1_UART_Init(void);
-static void MX_TIM_INIT(void);
+
+/* USER CODE BEGIN PFP */
+/* Private function prototypes -----------------------------------------------*/
+
+/* USER CODE END PFP */
+
+/* USER CODE BEGIN 0 */
+__IO uint16_t InjConvValue = 0;
 
 
-int main(void)
+/**
+  * @brief  Injected conversion complete callback.
+  * @note   In interrupt mode, user has to read conversion value in this function
+            using HAL_SDADC_InjectedGetValue or HAL_SDADC_InjectedMultiModeGetValue.
+  * @param  hsdadc : SDADC handle.
+  * @retval None
+  */
+void HAL_SDADC_InjectedConvCpltCallback(SDADC_HandleTypeDef* hsdadc)
 {
+    uint32_t InjChannel = 8;
+    InjConvValue = HAL_SDADC_InjectedGetValue(&hsdadc2, (uint32_t *) &InjChannel);
+}
+/* USER CODE END 0 */
+
+int main(void) {
+
+    /* USER CODE BEGIN 1 */
+
+    char out[10];
+
+    /* USER CODE END 1 */
+
+    /* MCU Configuration----------------------------------------------------------*/
+
     /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
     HAL_Init();
 
     /* Configure the system clock */
     SystemClock_Config();
 
-    char out[10];
-
     /* Initialize all configured peripherals */
     MX_GPIO_Init();
-    MX_DMA_Init();
-    MX_SDADC1_Init();
-    MX_SDADC2_Init();
     MX_SPI3_Init();
     MX_USART1_UART_Init();
-    MX_TIM_INIT();
-    while (1)
-    {
-        uint32_t count = __HAL_TIM_GetCounter(&tim2);
-	    HAL_SDADC_Start(&hsdadc2);
-        while (HAL_SDADC_PollForConversion(&hsdadc2, 100) != HAL_OK);
-        int16_t value = (int16_t) HAL_SDADC_GetValue(&hsdadc2);
-	    sprintf(out, "%lu\r\n", count);
-	    int16_t len = strlen(out);
-	    HAL_UART_Transmit(&huart1, out, len, 0xFFFF);
+    MX_SDADC2_Init();
+    /* USER CODE BEGIN 2 */
+
+    /* USER CODE END 2 */
+
+    /* Infinite loop */
+    /* USER CODE BEGIN WHILE */
+    while (1) {
+
+        /* USER CODE END WHILE */
+        sprintf(out, "%hd\r\n", InjConvValue);
+        int16_t len = strlen(out);
+        HAL_UART_Transmit(&huart1, (uint8_t*)out, len, 0xFFFF);
+
+        /* USER CODE BEGIN 3 */
+
     }
+    /* USER CODE END 3 */
 
 }
 
 /** System Clock Configuration
 */
-void SystemClock_Config(void)
-{
+void SystemClock_Config(void) {
 
     RCC_OscInitTypeDef RCC_OscInitStruct;
     RCC_ClkInitTypeDef RCC_ClkInitStruct;
@@ -108,35 +144,30 @@ void SystemClock_Config(void)
     RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
     RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
     RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL6;
-    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-    {
+    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
         Error_Handler();
     }
 
-    RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                                  |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+    RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
+                                  | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
     RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
     RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
     RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
     RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
-    if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
-    {
+    if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK) {
         Error_Handler();
     }
 
-    PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_SDADC;
+    PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1 | RCC_PERIPHCLK_SDADC;
     PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_SYSCLK;
     PeriphClkInit.SdadcClockSelection = RCC_SDADCSYSCLK_DIV12;
-    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
-    {
+    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK) {
         Error_Handler();
     }
-
-    HAL_PWREx_EnableSDADC(PWR_SDADC_ANALOG1);
 
     HAL_PWREx_EnableSDADC(PWR_SDADC_ANALOG2);
 
-    HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/1000);
+    HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq() / 1000);
 
     HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
 
@@ -144,45 +175,25 @@ void SystemClock_Config(void)
     HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 }
 
-/* SDADC1 init function */
-static void MX_SDADC1_Init(void)
-{
-
-    /**Configure the SDADC low power mode, fast conversion mode,
-    slow clock mode and SDADC1 reference voltage
-    */
-    hsdadc1.Instance = SDADC1;
-    hsdadc1.Init.IdleLowPowerMode = SDADC_LOWPOWER_NONE;
-    hsdadc1.Init.FastConversionMode = SDADC_FAST_CONV_DISABLE;
-    hsdadc1.Init.SlowClockMode = SDADC_SLOW_CLOCK_DISABLE;
-    hsdadc1.Init.ReferenceVoltage = SDADC_VREF_EXT;
-    if (HAL_SDADC_Init(&hsdadc1) != HAL_OK)
-    {
-        Error_Handler();
-    }
-
-}
-
 /* SDADC2 init function */
-static void MX_SDADC2_Init(void)
-{
+static void MX_SDADC2_Init(void) {
 
     SDADC_ConfParamTypeDef confParam;
 
     /**Configure the SDADC low power mode, fast conversion mode,
-    slow clock mode and SDADC1 reference voltage
+    slow clock mode and SDADC2 reference voltage
     */
     hsdadc2.Instance = SDADC2;
     hsdadc2.Init.IdleLowPowerMode = SDADC_LOWPOWER_NONE;
     hsdadc2.Init.FastConversionMode = SDADC_FAST_CONV_DISABLE;
     hsdadc2.Init.SlowClockMode = SDADC_SLOW_CLOCK_DISABLE;
     hsdadc2.Init.ReferenceVoltage = SDADC_VREF_EXT;
-    hsdadc2.RegularContMode     = SDADC_CONTINUOUS_CONV_OFF;
-    hsdadc2.InjectedContMode    = SDADC_CONTINUOUS_CONV_OFF;
-        
+    hsdadc2.RegularContMode = SDADC_CONTINUOUS_CONV_OFF;
+    hsdadc2.InjectedContMode = SDADC_CONTINUOUS_CONV_OFF;
+
     if (HAL_SDADC_Init(&hsdadc2) != HAL_OK)
         Error_Handler();
-    
+
     /* -2- Prepare the channel configuration */
     confParam.CommonMode = SDADC_COMMON_MODE_VDDA_2;
     confParam.Gain = SDADC_GAIN_1;
@@ -197,13 +208,20 @@ static void MX_SDADC2_Init(void)
         Error_Handler();
 
     /* select channel 8 for injected conversion and not for continuous mode */
-    if (HAL_SDADC_ConfigChannel(&hsdadc2, SDADC_CHANNEL_8, SDADC_CONTINUOUS_CONV_OFF) != HAL_OK)
+    /* select channel 8 for injected conversion and not for continuous mode */
+    if (HAL_SDADC_InjectedConfigChannel(&hsdadc2, SDADC_CHANNEL_8, SDADC_CONTINUOUS_CONV_OFF) != HAL_OK)
         Error_Handler();
 
     /* Select external trigger for injected conversion */
-    if (HAL_SDADC_SelectRegularTrigger(&hsdadc2, SDADC_SOFTWARE_TRIGGER) != HAL_OK)
+    if (HAL_SDADC_SelectInjectedTrigger(&hsdadc2, SDADC_EXTERNAL_TRIGGER) != HAL_OK)
         /* An error occurs during the selection of the trigger */
         Error_Handler();
+
+    /* Select timer 2 channel 3 as external trigger and rising edge */
+    if (HAL_SDADC_SelectInjectedExtTrigger(&hsdadc2, SDADC_EXT_TRIG_TIM2_CC3, SDADC_EXT_TRIG_RISING_EDGE) != HAL_OK) {
+        /* An error occurs during the selection of the trigger */
+        Error_Handler();
+    }
 
     /* Start Calibration in polling mode */
     if (HAL_SDADC_CalibrationStart(&hsdadc2, SDADC_CALIBRATION_SEQ_1) != HAL_OK)
@@ -214,11 +232,23 @@ static void MX_SDADC2_Init(void)
     if (HAL_SDADC_PollForCalibEvent(&hsdadc2, HAL_MAX_DELAY) != HAL_OK)
         /* An error occurs while waiting for the end of the calibration */
         Error_Handler();
+
+    /* Start injected conversion in interrupt mode */
+    if (HAL_SDADC_InjectedStart_IT(&hsdadc2) != HAL_OK) {
+        /* An error occurs during the configuration of the injected conversion in interrupt mode */
+        Error_Handler();
+    }
+
+    /* Start the TIMER's Channel */
+    if (HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3) != HAL_OK) {
+        /* An error occurs during the configuration of the timer in PWM mode */
+        Error_Handler();
+    }
+
 }
 
 /* SPI3 init function */
-static void MX_SPI3_Init(void)
-{
+static void MX_SPI3_Init(void) {
 
     hspi3.Instance = SPI3;
     hspi3.Init.Mode = SPI_MODE_SLAVE;
@@ -233,16 +263,15 @@ static void MX_SPI3_Init(void)
     hspi3.Init.CRCPolynomial = 7;
     hspi3.Init.CRCLength = SPI_CRC_LENGTH_DATASIZE;
     hspi3.Init.NSSPMode = SPI_NSS_PULSE_DISABLE;
-    if (HAL_SPI_Init(&hspi3) != HAL_OK)
-    {
+    if (HAL_SPI_Init(&hspi3) != HAL_OK) {
         Error_Handler();
     }
 
 }
 
+
 /* USART1 init function */
-static void MX_USART1_UART_Init(void)
-{
+static void MX_USART1_UART_Init(void) {
 
     huart1.Instance = USART1;
     huart1.Init.BaudRate = 115200;
@@ -254,67 +283,33 @@ static void MX_USART1_UART_Init(void)
     huart1.Init.OverSampling = UART_OVERSAMPLING_16;
     huart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
     huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-    if (HAL_UART_Init(&huart1) != HAL_OK)
-    {
+    if (HAL_UART_Init(&huart1) != HAL_OK) {
         Error_Handler();
     }
-
 }
 
-static void  MX_TIM_INIT(void)
-{
-    __HAL_RCC_TIM2_CLK_ENABLE();
-    /* Configure the timer in PWM mode */
-    tim2.Instance = TIM2;
-    tim2.Init.ClockDivision = 0;
-    tim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-    tim2.Init.Period = 4687; /* Freq = 72Mhz/65535 = 1.098 KHz */
-    tim2.Init.Prescaler = 0;
-    HAL_TIM_Base_Init(&tim2);
-    HAL_TIM_Base_Start(&tim2);
-}
-
-/**
-  * Enable DMA controller clock
-  */
-static void MX_DMA_Init(void)
-{
-    /* DMA controller clock enable */
-    __HAL_RCC_DMA2_CLK_ENABLE();
-
-    /* DMA interrupt init */
-    /* DMA2_Channel2_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA2_Channel2_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(DMA2_Channel2_IRQn);
-    /* DMA2_Channel4_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA2_Channel4_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(DMA2_Channel4_IRQn);
-
-}
-
-/** Configure pins as
-        * Analog
-        * Input
+/** Configure pins as 
+        * Analog 
+        * Input 
         * Output
         * EVENT_OUT
         * EXTI
 */
-static void MX_GPIO_Init(void)
-{
+static void MX_GPIO_Init(void) {
 
     GPIO_InitTypeDef GPIO_InitStruct;
 
     /* GPIO Ports Clock Enable */
     __HAL_RCC_GPIOF_CLK_ENABLE();
     __HAL_RCC_GPIOA_CLK_ENABLE();
-    __HAL_RCC_GPIOB_CLK_ENABLE();
     __HAL_RCC_GPIOE_CLK_ENABLE();
+    __HAL_RCC_GPIOB_CLK_ENABLE();
 
     /*Configure GPIO pin Output Level */
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
 
     /*Configure GPIO pin Output Level */
-    HAL_GPIO_WritePin(GPIOF, GPIO_PIN_6|GPIO_PIN_7, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOF, GPIO_PIN_6 | GPIO_PIN_7, GPIO_PIN_RESET);
 
     /*Configure GPIO pin : PA0 */
     GPIO_InitStruct.Pin = GPIO_PIN_0;
@@ -324,7 +319,7 @@ static void MX_GPIO_Init(void)
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
     /*Configure GPIO pins : PF6 PF7 */
-    GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_7;
+    GPIO_InitStruct.Pin = GPIO_PIN_6 | GPIO_PIN_7;
     GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -347,12 +342,10 @@ static void MX_GPIO_Init(void)
   * @param  None
   * @retval None
   */
-void Error_Handler(void)
-{
+void Error_Handler(void) {
     /* USER CODE BEGIN Error_Handler */
     /* User can add his own implementation to report the HAL error return state */
-    while(1)
-    {
+    while (1) {
     }
     /* USER CODE END Error_Handler */
 }
@@ -368,10 +361,10 @@ void Error_Handler(void)
    */
 void assert_failed(uint8_t* file, uint32_t line)
 {
-    /* USER CODE BEGIN 6 */
-    /* User can add his own implementation to report the file name and line number,
-      ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-    /* USER CODE END 6 */
+  /* USER CODE BEGIN 6 */
+  /* User can add his own implementation to report the file name and line number,
+    ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+  /* USER CODE END 6 */
 
 }
 

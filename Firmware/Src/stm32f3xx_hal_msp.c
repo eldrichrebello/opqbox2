@@ -34,12 +34,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f3xx_hal.h"
 
-extern DMA_HandleTypeDef hdma_sdadc2;
-
-extern DMA_HandleTypeDef hdma_spi3_tx;
-
 extern void Error_Handler(void);
 /* USER CODE BEGIN 0 */
+
+extern  TIM_HandleTypeDef htim2;
 
 /* USER CODE END 0 */
 
@@ -81,34 +79,15 @@ void HAL_SDADC_MspInit(SDADC_HandleTypeDef* hsdadc)
 {
 
   GPIO_InitTypeDef GPIO_InitStruct;
-  if(hsdadc->Instance==SDADC1)
-  {
-  /* USER CODE BEGIN SDADC1_MspInit 0 */
-
-  /* USER CODE END SDADC1_MspInit 0 */
-    /* Peripheral clock enable */
-    __HAL_RCC_SDADC1_CLK_ENABLE();
-  
-    /**SDADC1 GPIO Configuration    
-    PB0     ------> SDADC1_AIN6P 
-    */
-    GPIO_InitStruct.Pin = GPIO_PIN_0;
-    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /* USER CODE BEGIN SDADC1_MspInit 1 */
-
-  /* USER CODE END SDADC1_MspInit 1 */
-  }
-  else if(hsdadc->Instance==SDADC2)
+  if(hsdadc->Instance==SDADC2)
   {
   /* USER CODE BEGIN SDADC2_MspInit 0 */
 
   /* USER CODE END SDADC2_MspInit 0 */
     /* Peripheral clock enable */
     __HAL_RCC_SDADC2_CLK_ENABLE();
-  
+
+
     /**SDADC2 GPIO Configuration    
     PE8     ------> SDADC2_AIN8P
     PE9     ------> SDADC2_AIN8M 
@@ -118,26 +97,32 @@ void HAL_SDADC_MspInit(SDADC_HandleTypeDef* hsdadc)
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
-    /* Peripheral DMA init*/
-  
-    hdma_sdadc2.Instance = DMA2_Channel4;
-    hdma_sdadc2.Init.Direction = DMA_PERIPH_TO_MEMORY;
-    hdma_sdadc2.Init.PeriphInc = DMA_PINC_DISABLE;
-    hdma_sdadc2.Init.MemInc = DMA_MINC_ENABLE;
-    hdma_sdadc2.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
-    hdma_sdadc2.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
-    hdma_sdadc2.Init.Mode = DMA_NORMAL;
-    hdma_sdadc2.Init.Priority = DMA_PRIORITY_MEDIUM;
-    if (HAL_DMA_Init(&hdma_sdadc2) != HAL_OK)
-    {
-      Error_Handler();
-    }
-
-    __HAL_LINKDMA(hsdadc,hdma,hdma_sdadc2);
-
   /* USER CODE BEGIN SDADC2_MspInit 1 */
+    static TIM_OC_InitTypeDef tim_oc;
 
-  /* USER CODE END SDADC2_MspInit 1 */
+    HAL_NVIC_SetPriority(SDADC2_IRQn, 0x01, 0);
+    HAL_NVIC_EnableIRQ(SDADC2_IRQn);
+
+
+    __HAL_RCC_TIM2_CLK_ENABLE();
+    /* Configure the timer in PWM mode */
+    htim2.Instance = TIM2;
+    htim2.Init.ClockDivision = 0;
+    htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+    htim2.Init.Period = 0xFFFF; /* Freq = 72Mhz/65535 = 1.098 KHz */
+    htim2.Init.Prescaler = 0;
+    HAL_TIM_PWM_Init(&htim2);
+
+
+    tim_oc.OCMode = TIM_OCMODE_PWM1;
+    tim_oc.Pulse = 0x7FFF;
+    tim_oc.OCPolarity = TIM_OCPOLARITY_HIGH;
+    tim_oc.OCFastMode = TIM_OCFAST_DISABLE;
+    HAL_TIM_PWM_ConfigChannel(&htim2, &tim_oc, TIM_CHANNEL_3);
+/* Peripheral interrupt init*/
+//    HAL_NVIC_SetPriority(TIM2_IRQn, 0, 0);
+//    HAL_NVIC_EnableIRQ(TIM2_IRQn);
+    /* USER CODE END SDADC2_MspInit 1 */
   }
 
 }
@@ -145,43 +130,24 @@ void HAL_SDADC_MspInit(SDADC_HandleTypeDef* hsdadc)
 void HAL_SDADC_MspDeInit(SDADC_HandleTypeDef* hsdadc)
 {
 
-  if(hsdadc->Instance==SDADC1)
-  {
-  /* USER CODE BEGIN SDADC1_MspDeInit 0 */
-
-  /* USER CODE END SDADC1_MspDeInit 0 */
-    /* Peripheral clock disable */
-    __HAL_RCC_SDADC1_CLK_DISABLE();
-  
-    /**SDADC1 GPIO Configuration    
-    PB0     ------> SDADC1_AIN6P 
-    */
-    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_0);
-
-  /* USER CODE BEGIN SDADC1_MspDeInit 1 */
-
-  /* USER CODE END SDADC1_MspDeInit 1 */
-  }
-  else if(hsdadc->Instance==SDADC2)
+  if(hsdadc->Instance==SDADC2)
   {
   /* USER CODE BEGIN SDADC2_MspDeInit 0 */
 
   /* USER CODE END SDADC2_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_SDADC2_CLK_DISABLE();
-  
+
     /**SDADC2 GPIO Configuration    
     PE8     ------> SDADC2_AIN8P
     PE9     ------> SDADC2_AIN8M 
     */
     HAL_GPIO_DeInit(GPIOE, GPIO_PIN_8|GPIO_PIN_9);
 
-    /* Peripheral DMA DeInit*/
-    HAL_DMA_DeInit(hsdadc->hdma);
+  }
   /* USER CODE BEGIN SDADC2_MspDeInit 1 */
 
   /* USER CODE END SDADC2_MspDeInit 1 */
-  }
 
 }
 
@@ -200,32 +166,22 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
     /**SPI3 GPIO Configuration    
     PA1     ------> SPI3_SCK
     PA2     ------> SPI3_MISO
-    PA3     ------> SPI3_MOSI
-    PA4     ------> SPI3_NSS 
+    PA4     ------> SPI3_NSS
+    PB5     ------> SPI3_MOSI 
     */
-    GPIO_InitStruct.Pin = GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3|GPIO_PIN_4;
+    GPIO_InitStruct.Pin = GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_4;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF6_SPI3;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-    /* Peripheral DMA init*/
-  
-    hdma_spi3_tx.Instance = DMA2_Channel2;
-    hdma_spi3_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
-    hdma_spi3_tx.Init.PeriphInc = DMA_PINC_DISABLE;
-    hdma_spi3_tx.Init.MemInc = DMA_MINC_ENABLE;
-    hdma_spi3_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
-    hdma_spi3_tx.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
-    hdma_spi3_tx.Init.Mode = DMA_NORMAL;
-    hdma_spi3_tx.Init.Priority = DMA_PRIORITY_LOW;
-    if (HAL_DMA_Init(&hdma_spi3_tx) != HAL_OK)
-    {
-      Error_Handler();
-    }
-
-    __HAL_LINKDMA(hspi,hdmatx,hdma_spi3_tx);
+    GPIO_InitStruct.Pin = GPIO_PIN_5;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF6_SPI3;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /* USER CODE BEGIN SPI3_MspInit 1 */
 
@@ -248,19 +204,20 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef* hspi)
     /**SPI3 GPIO Configuration    
     PA1     ------> SPI3_SCK
     PA2     ------> SPI3_MISO
-    PA3     ------> SPI3_MOSI
-    PA4     ------> SPI3_NSS 
+    PA4     ------> SPI3_NSS
+    PB5     ------> SPI3_MOSI 
     */
-    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3|GPIO_PIN_4);
+    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_4);
 
-    /* Peripheral DMA DeInit*/
-    HAL_DMA_DeInit(hspi->hdmatx);
+    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_5);
+
   }
   /* USER CODE BEGIN SPI3_MspDeInit 1 */
 
   /* USER CODE END SPI3_MspDeInit 1 */
 
 }
+
 
 void HAL_UART_MspInit(UART_HandleTypeDef* huart)
 {
