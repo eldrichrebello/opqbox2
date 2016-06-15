@@ -26,7 +26,7 @@ SET(COMMON_FLAGS "-mthumb \
         -Wall -fno-common -fno-strict-aliasing")
 
 SET(CMAKE_C_FLAGS ${COMMON_FLAGS})
-SET(CMAKE_C_LINK_FLAGS "-Wl,-gc-sections,-Map=$*.map,-cref,-T${PROJECT_SOURCE_DIR}/STM32F373CC_FLASH.ld -mthumb -mcpu=cortex-m4 -mfloat-abi=softfp -mfpu=fpv4-sp-d16")
+SET(CMAKE_C_LINK_FLAGS "-Wl,-gc-sections,-Map=opq.map,-cref,-T${PROJECT_SOURCE_DIR}/STM32F373CC_FLASH.ld -mthumb -mcpu=cortex-m4 -mfloat-abi=softfp -mfpu=fpv4-sp-d16")
 SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 
 set(SOURCE_FILES
@@ -63,3 +63,19 @@ set(SOURCE_FILES
 set_property(SOURCE Drivers/CMSIS/Device/ST/STM32F3xx/Source/startup_stm32f373xc.s PROPERTY LANGUAGE C)
 
 add_executable(opq.elf ${SOURCE_FILES})
+
+add_custom_target(opq.bin
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/
+	DEPENDS opq.elf
+	COMMAND arm-none-eabi-objcopy -O binary opq.elf opq.bin
+)
+
+ add_custom_target(deployToPi
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/
+	DEPENDS opq.bin
+	COMMAND scp opq.bin pi@192.168.1.136:~/soft/opqbox2/pypi/DSP/
+)
+
+add_custom_target(clean-all
+	rm opq.map opq.bin 
+	)
