@@ -1,52 +1,40 @@
-cmake_minimum_required(VERSION 3.3)
-project(Firmware)
+cmake_minimum_required(VERSION 3.0.2)
+project(opq.elf)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+INCLUDE(CMakeForceCompiler)
+
+SET(CMAKE_SYSTEM_NAME Generic)
+SET(CMAKE_SYSTEM_VERSION 1)
+
+# specify the cross compiler
+CMAKE_FORCE_C_COMPILER(arm-none-eabi-gcc GNU)
+CMAKE_FORCE_CXX_COMPILER(arm-none-eabi-g++ GNU)
+
+
+SET(COMMON_FLAGS "-mthumb \
+        -mcpu=cortex-m4 \
+        -mfloat-abi=softfp \
+        -mfpu=fpv4-sp-d16 \
+        -DSTM32F373xC \
+        -DUSE_HAL_DRIVER \
+        \"-D__weak=__attribute__((weak)) \" \
+        \"-D__packed=__attribute__((__packed__)) \" \
+        -I${PROJECT_SOURCE_DIR}/Drivers/CMSIS/Include/ \
+        -I${PROJECT_SOURCE_DIR}/Drivers/STM32F3xx_HAL_Driver/Inc/ \
+        -I${PROJECT_SOURCE_DIR}/Inc/    \
+        -I${PROJECT_SOURCE_DIR}/Drivers/CMSIS/Device/ST/STM32F3xx/Include/ \
+        -Wall -fno-common -fno-strict-aliasing")
+
+SET(CMAKE_C_FLAGS ${COMMON_FLAGS})
+SET(CMAKE_C_LINK_FLAGS "-Wl,-gc-sections,-Map=$*.map,-cref,-T${PROJECT_SOURCE_DIR}/STM32F373CC_FLASH.ld -mthumb -mcpu=cortex-m4 -mfloat-abi=softfp -mfpu=fpv4-sp-d16")
+SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 
 set(SOURCE_FILES
     Drivers/CMSIS/Device/ST/STM32F3xx/Include/stm32f373xc.h
     Drivers/CMSIS/Device/ST/STM32F3xx/Include/stm32f3xx.h
     Drivers/CMSIS/Device/ST/STM32F3xx/Include/system_stm32f3xx.h
     Drivers/CMSIS/Device/ST/STM32F3xx/Source/system_stm32f3xx.c
-    Drivers/CMSIS/Include/arm_common_tables.h
-    Drivers/CMSIS/Include/arm_const_structs.h
-    Drivers/CMSIS/Include/arm_math.h
-    Drivers/CMSIS/Include/cmsis_armcc.h
-    Drivers/CMSIS/Include/cmsis_armcc_V6.h
-    Drivers/CMSIS/Include/cmsis_gcc.h
-    Drivers/CMSIS/Include/core_cm0.h
-    Drivers/CMSIS/Include/core_cm0plus.h
-    Drivers/CMSIS/Include/core_cm3.h
-    Drivers/CMSIS/Include/core_cm4.h
-    Drivers/CMSIS/Include/core_cm7.h
-    Drivers/CMSIS/Include/core_cmFunc.h
-    Drivers/CMSIS/Include/core_cmInstr.h
-    Drivers/CMSIS/Include/core_cmSimd.h
-    Drivers/CMSIS/Include/core_sc000.h
-    Drivers/CMSIS/Include/core_sc300.h
-    Drivers/STM32F3xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h
-    Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal.h
-    Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_cortex.h
-    Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_def.h
-    Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_dma.h
-    Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_dma_ex.h
-    Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_flash.h
-    Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_flash_ex.h
-    Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_gpio.h
-    Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_gpio_ex.h
-    Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_i2c.h
-    Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_i2c_ex.h
-    Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_pwr.h
-    Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_pwr_ex.h
-    Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_rcc.h
-    Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_rcc_ex.h
-    Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_sdadc.h
-    Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_spi.h
-    Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_spi_ex.h
-    Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_tim.h
-    Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_tim_ex.h
-    Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_uart.h
-    Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_uart_ex.h
+    Drivers/CMSIS/Device/ST/STM32F3xx/Source/startup_stm32f373xc.s
     Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal.c
     Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_cortex.c
     Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_dma.c
@@ -66,14 +54,12 @@ set(SOURCE_FILES
     Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_tim_ex.c
     Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart.c
     Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart_ex.c
-    Inc/mxconstants.h
-    Inc/stm32f3xx_hal_conf.h
-    Inc/stm32f3xx_it.h
     Src/newlib_stub.c
-    Src/main.c
+    Src/opq.c
     Src/stm32f3xx_hal_msp.c
     Src/stm32f3xx_it.c
-    Makefile
-    STM32F373CC_FLASH.ld)
+    Src/runtime_config.c)
 
-add_executable(Firmware ${SOURCE_FILES})
+set_property(SOURCE Drivers/CMSIS/Device/ST/STM32F3xx/Source/startup_stm32f373xc.s PROPERTY LANGUAGE C)
+
+add_executable(opq.elf ${SOURCE_FILES})
