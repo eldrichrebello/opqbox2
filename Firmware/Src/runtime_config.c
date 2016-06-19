@@ -9,11 +9,16 @@ typedef struct {
 
 __IO OPQ_Runtime_Config opq_config;
 
+OPQ_Frame_Buffer frameBuffer;
+
 void init_OPQ_RunTime(){
     int i = 0;
     for(; i< OPQ_CONFIG_REG_NUM; i++){
         opq_config.vals[i] = 0;
     }
+    frameBuffer.head = 0;
+    frameBuffer.tail = 0;
+    frameBuffer.currentSample = 0;
 }
 
 void OPQ_setReg(uint8_t regNum, int16_t val){

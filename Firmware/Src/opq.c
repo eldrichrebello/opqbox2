@@ -34,6 +34,7 @@
 #include "stm32f3xx_hal.h"
 #include <stdio.h>
 #include <string.h>
+#include <runtime_config.h>
 
 /* USER CODE BEGIN Includes */
 
@@ -72,9 +73,9 @@ static void MX_USART1_UART_Init(void);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
-__IO uint16_t InjConvValue = 0;
 
-
+extern __IO OPQ_Frame_Buffer frameBuffer;
+__IO int16_t InjConvValue;
 /**
   * @brief  Injected conversion complete callback.
   * @note   In interrupt mode, user has to read conversion value in this function
@@ -82,10 +83,21 @@ __IO uint16_t InjConvValue = 0;
   * @param  hsdadc : SDADC handle.
   * @retval None
   */
+
 void HAL_SDADC_InjectedConvCpltCallback(SDADC_HandleTypeDef* hsdadc)
 {
     uint32_t InjChannel = 8;
     InjConvValue = HAL_SDADC_InjectedGetValue(&hsdadc2, (uint32_t *) &InjChannel);
+    frameBuffer.frames[frameBuffer.head].data[frameBuffer.currentSample] = InjConvValue;
+
+    frameBuffer.currentSample++;
+    if(frameBuffer.currentSample >= 200) {
+        frameBuffer.currentSample = 0;
+        frameBuffer.head++;
+        if (frameBuffer.head >= FRAME_BUFFER_SIZE) {
+            frameBuffer.head = 0;
+        }
+    }
 }
 /* USER CODE END 0 */
 
@@ -111,7 +123,7 @@ int main(void) {
     MX_USART1_UART_Init();
     MX_SDADC2_Init();
     /* USER CODE BEGIN 2 */
-
+    init_OPQ_RunTime();
     /* USER CODE END 2 */
 
     /* Infinite loop */
