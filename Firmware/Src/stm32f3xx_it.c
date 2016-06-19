@@ -38,6 +38,7 @@
 /* USER CODE BEGIN 0 */
 extern UART_HandleTypeDef huart1;
 extern SDADC_HandleTypeDef hsdadc2;
+extern SPI_HandleTypeDef hspi3;
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
@@ -175,5 +176,10 @@ void SysTick_Handler(void) {
 void SDADC2_IRQHandler(void) {
     HAL_SDADC_IRQHandler(&hsdadc2);
 }
+
+void SPI3_IRQHandler(void) {
+    HAL_SPI_IRQHandler(&hspi3);
+}
+
 /* USER CODE END 1 */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

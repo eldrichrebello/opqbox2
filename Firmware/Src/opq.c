@@ -133,10 +133,13 @@ int main(void) {
         /* USER CODE END WHILE */
         sprintf(out, "%hd\r\n", InjConvValue);
         int16_t len = strlen(out);
+        uint8_t data = 'c';
+        HAL_SPI_Transmit_IT(&hspi3,&data, 1);
+        while (HAL_SPI_GetState(&hspi3) != HAL_SPI_STATE_READY) {
+
+        }
         HAL_UART_Transmit(&huart1, (uint8_t*)out, len, 0xFFFF);
-
         /* USER CODE BEGIN 3 */
-
     }
     /* USER CODE END 3 */
 

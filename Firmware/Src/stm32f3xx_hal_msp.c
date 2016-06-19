@@ -167,24 +167,18 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
     PA1     ------> SPI3_SCK
     PA2     ------> SPI3_MISO
     PA4     ------> SPI3_NSS
-    PB5     ------> SPI3_MOSI 
+    PA3     ------> SPI3_MOSI
     */
-    GPIO_InitStruct.Pin = GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_4;
+    GPIO_InitStruct.Pin = GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3|GPIO_PIN_4;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF6_SPI3;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = GPIO_PIN_5;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-    GPIO_InitStruct.Alternate = GPIO_AF6_SPI3;
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
   /* USER CODE BEGIN SPI3_MspInit 1 */
-
+    HAL_NVIC_SetPriority(SPI3_IRQn, 0, 1);
+    HAL_NVIC_EnableIRQ(SPI3_IRQn);
   /* USER CODE END SPI3_MspInit 1 */
   }
 
@@ -207,9 +201,8 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef* hspi)
     PA4     ------> SPI3_NSS
     PB5     ------> SPI3_MOSI 
     */
-    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_4);
+    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3|GPIO_PIN_4);
 
-    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_5);
 
   }
   /* USER CODE BEGIN SPI3_MspDeInit 1 */
