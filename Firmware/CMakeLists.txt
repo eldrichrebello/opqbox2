@@ -10,101 +10,72 @@ SET(CMAKE_SYSTEM_VERSION 1)
 CMAKE_FORCE_C_COMPILER(arm-none-eabi-gcc GNU)
 CMAKE_FORCE_CXX_COMPILER(arm-none-eabi-g++ GNU)
 
-SET(COMMON_FLAGS "-mcpu=cortex-m4 \
-        -mthumb \
-       -mfpu=fpv4-sp-d16 \
-       -mfloat-abi=hard \
-       -DSTM32F303VC -DSTM32F30X \
-        -D__FPU_USED \
-        -DUSE_STDPERIPH_DRIVER \
-        -I${PROJECT_SOURCE_DIR}/src/cmsis_boot/headers/ \
-        -I${PROJECT_SOURCE_DIR}/src/cmsis/headers/ \
-        -I${PROJECT_SOURCE_DIR}/src/stm_lib/headers/    \
-        -I${PROJECT_SOURCE_DIR}/src/opq/    \
-        ")
-SET(CMAKE_CXX_FLAGS ${COMMON_FLAGS})
+
+SET(COMMON_FLAGS "-mthumb \
+        -mcpu=cortex-m4 \
+        -mfloat-abi=softfp \
+        -mfpu=fpv4-sp-d16 \
+        -DSTM32F373xC \
+        -DUSE_HAL_DRIVER \
+        \"-D__weak=__attribute__((weak)) \" \
+        \"-D__packed=__attribute__((__packed__)) \" \
+        -I${PROJECT_SOURCE_DIR}/Drivers/CMSIS/Include/ \
+        -I${PROJECT_SOURCE_DIR}/Drivers/STM32F3xx_HAL_Driver/Inc/ \
+        -I${PROJECT_SOURCE_DIR}/Inc/    \
+        -I${PROJECT_SOURCE_DIR}/Drivers/CMSIS/Device/ST/STM32F3xx/Include/ \
+        -Wall -fno-common -fno-strict-aliasing")
+
 SET(CMAKE_C_FLAGS ${COMMON_FLAGS})
-SET(CMAKE_C_LINK_FLAGS "-Wl,-gc-sections,-T${PROJECT_SOURCE_DIR}/src/arm-gcc-link.ld")
-SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "-Wl,-gc-sections,-T${PROJECT_SOURCE_DIR}/src/arm-gcc-link.ld")
-
-INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/src/cmsis_boot/headers/ \
-    ${PROJECT_SOURCE_DIR}/src/cmsis/headers/ \
-    ${PROJECT_SOURCE_DIR}/src/stm_lib/headers/ \
-    ${PROJECT_SOURCE_DIR}/src/opq/ \
-    ")
-
-set(HEADER_FILES
-        src/cmsis/headers/arm_common_tables.h
-        src/cmsis/headers/arm_math.h
-        src/cmsis/headers/core_cm0.h
-        src/cmsis/headers/core_cm4.h
-        src/cmsis/headers/core_cm4_simd.h
-        src/cmsis/headers/core_cmFunc.h
-        src/cmsis/headers/core_cmInstr.h
-        src/cmsis/headers/core_sc000.h
-        src/cmsis/headers/core_sc300.h
-        src/cmsis_boot/headers/stm32f30x.h
-        src/cmsis_boot/headers/stm32f30x_conf.h
-        src/cmsis_boot/headers/system_stm32f30x.h
-        src/opq/c/config.h
-        src/opq/c/datastructures.h
-        src/opq/c/main.h
-        src/opq/c/platform_config.h
-        src/opq/c/stm32f30x_it.h
-        src/stm_lib/headers/stm32f30x_adc.h
-        src/stm_lib/headers/stm32f30x_can.h
-        src/stm_lib/headers/stm32f30x_comp.h
-        src/stm_lib/headers/stm32f30x_crc.h
-        src/stm_lib/headers/stm32f30x_dac.h
-        src/stm_lib/headers/stm32f30x_dbgmcu.h
-        src/stm_lib/headers/stm32f30x_dma.h
-        src/stm_lib/headers/stm32f30x_exti.h
-        src/stm_lib/headers/stm32f30x_flash.h
-        src/stm_lib/headers/stm32f30x_gpio.h
-        src/stm_lib/headers/stm32f30x_i2c.h
-        src/stm_lib/headers/stm32f30x_iwdg.h
-        src/stm_lib/headers/stm32f30x_misc.h
-        src/stm_lib/headers/stm32f30x_opamp.h
-        src/stm_lib/headers/stm32f30x_pwr.h
-        src/stm_lib/headers/stm32f30x_rcc.h
-        src/stm_lib/headers/stm32f30x_rtc.h
-        src/stm_lib/headers/stm32f30x_spi.h
-        src/stm_lib/headers/stm32f30x_syscfg.h
-        src/stm_lib/headers/stm32f30x_tim.h
-        src/stm_lib/headers/stm32f30x_usart.h
-        src/stm_lib/headers/stm32f30x_wwdg.h
-        )
+SET(CMAKE_C_LINK_FLAGS "-Wl,-gc-sections,-Map=opq.map,-cref,-T${PROJECT_SOURCE_DIR}/STM32F373CC_FLASH.ld -mthumb -mcpu=cortex-m4 -mfloat-abi=softfp -mfpu=fpv4-sp-d16")
+SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 
 set(SOURCE_FILES
-    src/cmsis_boot/c/startup_stm32f303.c
-    src/cmsis_boot/c/system_stm32f30x.c
-    src/opq/c/config.c
-    src/opq/c/main.c
-    src/opq/c/stm32f30x_it.c
-    src/stm_lib/c/stm32f30x_adc.c
-    src/stm_lib/c/stm32f30x_can.c
-    src/stm_lib/c/stm32f30x_comp.c
-    src/stm_lib/c/stm32f30x_crc.c
-    src/stm_lib/c/stm32f30x_dac.c
-    src/stm_lib/c/stm32f30x_dbgmcu.c
-    src/stm_lib/c/stm32f30x_dma.c
-    src/stm_lib/c/stm32f30x_exti.c
-    src/stm_lib/c/stm32f30x_flash.c
-    src/stm_lib/c/stm32f30x_gpio.c
-    src/stm_lib/c/stm32f30x_i2c.c
-    src/stm_lib/c/stm32f30x_iwdg.c
-    src/stm_lib/c/stm32f30x_misc.c
-    src/stm_lib/c/stm32f30x_opamp.c
-    src/stm_lib/c/stm32f30x_pwr.c
-    src/stm_lib/c/stm32f30x_rcc.c
-    src/stm_lib/c/stm32f30x_rtc.c
-    src/stm_lib/c/stm32f30x_spi.c
-    src/stm_lib/c/stm32f30x_syscfg.c
-    src/stm_lib/c/stm32f30x_tim.c
-    src/stm_lib/c/stm32f30x_usart.c
-    src/stm_lib/c/stm32f30x_wwdg.c
+    Drivers/CMSIS/Device/ST/STM32F3xx/Include/stm32f373xc.h
+    Drivers/CMSIS/Device/ST/STM32F3xx/Include/stm32f3xx.h
+    Drivers/CMSIS/Device/ST/STM32F3xx/Include/system_stm32f3xx.h
+    Drivers/CMSIS/Device/ST/STM32F3xx/Source/system_stm32f3xx.c
+    Drivers/CMSIS/Device/ST/STM32F3xx/Source/startup_stm32f373xc.s
+    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal.c
+    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_cortex.c
+    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_dma.c
+    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_flash.c
+    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_flash_ex.c
+    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_gpio.c
+    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_i2c.c
+    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_i2c_ex.c
+    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_pwr.c
+    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_pwr_ex.c
+    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc.c
+    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_rcc_ex.c
+    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_sdadc.c
+    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_spi.c
+    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_spi_ex.c
+    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_tim.c
+    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_tim_ex.c
+    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart.c
+    Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_uart_ex.c
+    Src/newlib_stub.c
+    Src/opq.c
+    Src/stm32f3xx_hal_msp.c
+    Src/stm32f3xx_it.c
+    Src/runtime_config.c)
+
+set_property(SOURCE Drivers/CMSIS/Device/ST/STM32F3xx/Source/startup_stm32f373xc.s PROPERTY LANGUAGE C)
+
+add_executable(opq.elf ${SOURCE_FILES})
+
+add_custom_target(opq.bin
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/
+	DEPENDS opq.elf
+	COMMAND arm-none-eabi-objcopy -O binary opq.elf opq.bin
 )
 
-add_executable(opq.elf
-        ${SOURCE_FILES}
-        ${HEADER_FILES})
+ add_custom_target(deployToPi
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/
+	DEPENDS opq.bin
+	COMMAND scp opq.bin pi@192.168.1.136:~/soft/opqbox2/pypi/DSP/
+)
+
+add_custom_target(clean-all
+	rm opq.map opq.bin 
+	)
