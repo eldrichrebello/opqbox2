@@ -37,3 +37,7 @@ def flash_dsp(fname):
 		return False
 	reset_dsp()
 	return True
+
+if __name__ == "__main__":
+	init()
+	flash_dsp('opq.bin')
