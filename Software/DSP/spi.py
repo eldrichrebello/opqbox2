@@ -2,8 +2,11 @@ import time
 import sys
 import spidev
 
-spi = spidev.SpiDev()
-spi.open(0,0)
+
+class DSP:
+    def __init__(self):
+        self.spi = spidev.SpiDev();
+        self.spi.open(0,0);
 
         
 def readAdc(channel):

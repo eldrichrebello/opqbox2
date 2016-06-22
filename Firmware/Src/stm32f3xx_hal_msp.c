@@ -109,13 +109,13 @@ void HAL_SDADC_MspInit(SDADC_HandleTypeDef* hsdadc)
     htim2.Instance = TIM2;
     htim2.Init.ClockDivision = 0;
     htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-    htim2.Init.Period = 0xFFFF; /* Freq = 72Mhz/65535 = 1.098 KHz */
+    htim2.Init.Period = 6000; /* Freq = 72Mhz/65535 = 1.098 KHz */
     htim2.Init.Prescaler = 0;
     HAL_TIM_PWM_Init(&htim2);
 
 
     tim_oc.OCMode = TIM_OCMODE_PWM1;
-    tim_oc.Pulse = 0x7FFF;
+    tim_oc.Pulse = 3000;
     tim_oc.OCPolarity = TIM_OCPOLARITY_HIGH;
     tim_oc.OCFastMode = TIM_OCFAST_DISABLE;
     HAL_TIM_PWM_ConfigChannel(&htim2, &tim_oc, TIM_CHANNEL_3);

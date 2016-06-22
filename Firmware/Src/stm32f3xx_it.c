@@ -178,6 +178,9 @@ void SDADC2_IRQHandler(void) {
 }
 
 void SPI3_IRQHandler(void) {
+    if(hspi3.TxXferSize/2 == hspi3.TxXferCount) {
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
+    }
     HAL_SPI_IRQHandler(&hspi3);
 }
 

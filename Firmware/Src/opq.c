@@ -75,7 +75,7 @@ static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN 0 */
 
 extern __IO OPQ_Frame_Buffer frameBuffer;
-__IO int16_t InjConvValue;
+
 /**
   * @brief  Injected conversion complete callback.
   * @note   In interrupt mode, user has to read conversion value in this function
@@ -84,14 +84,13 @@ __IO int16_t InjConvValue;
   * @retval None
   */
 
-void HAL_SDADC_InjectedConvCpltCallback(SDADC_HandleTypeDef* hsdadc)
-{
+void HAL_SDADC_InjectedConvCpltCallback(SDADC_HandleTypeDef *hsdadc) {
     uint32_t InjChannel = 8;
-    InjConvValue = HAL_SDADC_InjectedGetValue(&hsdadc2, (uint32_t *) &InjChannel);
+    int16_t InjConvValue = HAL_SDADC_InjectedGetValue(&hsdadc2, (uint32_t *) &InjChannel);
     frameBuffer.frames[frameBuffer.head].data[frameBuffer.currentSample] = InjConvValue;
 
     frameBuffer.currentSample++;
-    if(frameBuffer.currentSample >= 200) {
+    if (frameBuffer.currentSample >= 200) {
         frameBuffer.currentSample = 0;
         frameBuffer.head++;
         if (frameBuffer.head >= FRAME_BUFFER_SIZE) {
@@ -99,13 +98,12 @@ void HAL_SDADC_InjectedConvCpltCallback(SDADC_HandleTypeDef* hsdadc)
         }
     }
 }
+
 /* USER CODE END 0 */
 
 int main(void) {
 
     /* USER CODE BEGIN 1 */
-
-    char out[10];
 
     /* USER CODE END 1 */
 
@@ -125,28 +123,36 @@ int main(void) {
     /* USER CODE BEGIN 2 */
     init_OPQ_RunTime();
     /* USER CODE END 2 */
-
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
     /* Infinite loop */
     /* USER CODE BEGIN WHILE */
+    char out[10];
     while (1) {
-
+        int8_t data = '?';
         /* USER CODE END WHILE */
-        sprintf(out, "%hd\r\n", InjConvValue);
-        int16_t len = strlen(out);
-        uint8_t data = 'c';
-        HAL_SPI_Transmit_IT(&hspi3,&data, 1);
-        while (HAL_SPI_GetState(&hspi3) != HAL_SPI_STATE_READY) {
-
+        if ((HAL_SPI_GetState(&hspi3) == HAL_SPI_STATE_READY) && (frameBuffer.head != frameBuffer.tail)) {
+            HAL_SPI_Transmit_IT(&hspi3, (uint8_t *) &frameBuffer.frames[frameBuffer.tail], sizeof(OPQ_Frame));
+            frameBuffer.tail++;
+            if (frameBuffer.tail >= FRAME_BUFFER_SIZE) {
+                frameBuffer.tail = 0;
+            }
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
+            HAL_UART_Transmit(&huart1, (uint8_t *) &data, 1, 0xFFFF);
+            //if(HAL_SPI_GetState(&hspi3) != HAL_SPI_STATE_READY);
+            /* USER CODE END 3 */
         }
-        HAL_UART_Transmit(&huart1, (uint8_t*)out, len, 0xFFFF);
-        /* USER CODE BEGIN 3 */
+        /*
+        else{
+            sprintf(out, "%d\r\n", hspi3.TxXferCount);
+            uint16_t len = strlen(out);
+            HAL_UART_Transmit(&huart1,out,len,0xFFFF);
+        }
+         */
     }
-    /* USER CODE END 3 */
-
 }
 
-/** System Clock Configuration
-*/
+/** System Clock Configuration*/
+
 void SystemClock_Config(void) {
 
     RCC_OscInitTypeDef RCC_OscInitStruct;
@@ -233,7 +239,8 @@ static void MX_SDADC2_Init(void) {
         Error_Handler();
 
     /* Select timer 2 channel 3 as external trigger and rising edge */
-    if (HAL_SDADC_SelectInjectedExtTrigger(&hsdadc2, SDADC_EXT_TRIG_TIM2_CC3, SDADC_EXT_TRIG_RISING_EDGE) != HAL_OK) {
+    if (HAL_SDADC_SelectInjectedExtTrigger(&hsdadc2, SDADC_EXT_TRIG_TIM2_CC3, SDADC_EXT_TRIG_RISING_EDGE) !=
+        HAL_OK) {
         /* An error occurs during the selection of the trigger */
         Error_Handler();
     }
@@ -268,7 +275,7 @@ static void MX_SPI3_Init(void) {
     hspi3.Instance = SPI3;
     hspi3.Init.Mode = SPI_MODE_SLAVE;
     hspi3.Init.Direction = SPI_DIRECTION_2LINES;
-    hspi3.Init.DataSize = SPI_DATASIZE_4BIT;
+    hspi3.Init.DataSize = SPI_DATASIZE_8BIT;
     hspi3.Init.CLKPolarity = SPI_POLARITY_LOW;
     hspi3.Init.CLKPhase = SPI_PHASE_1EDGE;
     hspi3.Init.NSS = SPI_NSS_HARD_INPUT;

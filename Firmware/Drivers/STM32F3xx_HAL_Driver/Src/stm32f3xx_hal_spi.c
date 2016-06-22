@@ -2494,7 +2494,6 @@ static void SPI_TxISR_8BIT(struct __SPI_HandleTypeDef *hspi)
 {
   *(__IO uint8_t *)&hspi->Instance->DR = (*hspi->pTxBuffPtr++);
   hspi->TxXferCount--;
-
   if(hspi->TxXferCount == 0)
   {
     if(hspi->Init.CRCCalculation == SPI_CRCCALCULATION_ENABLE)

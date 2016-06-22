@@ -2,7 +2,7 @@
 #define OPQ_RUNTIME_CONFIG_H_H
 #include "stm32f3xx_hal.h"
 
-//Size of the frame buffer
+//Number of OPQFrames inside the OPQ_Frame_Buffer.
 #define FRAME_BUFFER_SIZE 4
 //OPQ data frame:
 typedef struct{
@@ -11,7 +11,7 @@ typedef struct{
     int32_t zero_crossing_low;
 } OPQ_Frame;
 
-
+//OPQ Frame Buffer. This is a persistent data structure for storing the data samples.
 typedef struct{
     OPQ_Frame frames[FRAME_BUFFER_SIZE];
     uint8_t head;
