@@ -1,0 +1,11 @@
+package opq;
+
+message Cycle{
+	required uint64 time = 1;
+	repeated int32 data = 2;
+}
+
+message DataMesaage{
+	required int32 id = 1;
+	required Cycle cycles = 2;
+}
