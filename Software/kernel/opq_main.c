@@ -29,7 +29,7 @@
 #define OPQ_SPI_MAX_SPEED 976000       //mhz ish
 #define OPQ_SPI_BITS_PER_WORD 8
 
-struct opq_frame_buffer{
+struct opq_frame_buffer {
     struct mutex * mutex;
     struct  semaphore* sem;
     uint8_t data[OPQ_CYCLE_BUFFER_COUNT][OPQ_CYCLE_BUFFER_SIZE];
@@ -161,7 +161,7 @@ static void opq_wq_spi_reader_handler(struct work_struct *w) {
     opq_dev->cycles->writer_pos++;
     if(opq_dev->cycles->writer_pos >= OPQ_CYCLE_BUFFER_COUNT)
         opq_dev->cycles->writer_pos  = 0;
-    if(opq_dev->cycles->writer_pos  == opq_dev->cycles->reader_pos){
+    if(opq_dev->cycles->writer_pos  == opq_dev->cycles->reader_pos) {
         //Reader is not keeping up. Have to evict an item.
         //Note we are not touching the semaphore in this case
         //since number of items has not changed.
@@ -170,7 +170,7 @@ static void opq_wq_spi_reader_handler(struct work_struct *w) {
             opq_dev->cycles->reader_pos  = 0;
 
     }
-    else{
+    else {
         up(opq_dev->cycles->sem);
     }
     mutex_unlock(opq_dev->cycles->mutex);
