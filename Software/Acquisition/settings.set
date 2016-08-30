@@ -1,0 +1,10 @@
+#device ID
+box_id                      :S  :1234
+#Cycles per sample
+frames_per_measurement      :I  :10
+#Triggering data host and port
+redis_trigger_host          :S  :128.171.10.167
+redis_trigger_port          :I  :6379
+redis_trigger_depth         :I  :600
+redis_auth                  :S  :nicetry
+acquisition_calibration_constant    :F  :151.34
