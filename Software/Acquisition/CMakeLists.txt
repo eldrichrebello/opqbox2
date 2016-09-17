@@ -1,20 +1,26 @@
 cmake_minimum_required(VERSION 3.0)
 project(Acquisition)
 
-set(LIBS "${CMAKE_CXX_FLAGS} -std=c++11")
-
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(LIBS "${CMAKE_CXX_FLAGS} ")
 
 include_directories(${CMAKE_SOURCE_DIR}/lib)
 include_directories(${CMAKE_SOURCE_DIR}/filters)
+include_directories(${CMAKE_SOURCE_DIR}/proto)
 
 FILE(GLOB sources ${CMAKE_SOURCE_DIR}/src/*.cpp)
 FILE(GLOB headers ${CMAKE_SOURCE_DIR}/lib/*.hpp)
 
 FILE(GLOB filter_src ${CMAKE_SOURCE_DIR}/filters/*.cpp)
-FILE(GLOB filter_inc ${CMAKE_SOURCE_DIR}/filters/*.lib)
+FILE(GLOB filter_inc ${CMAKE_SOURCE_DIR}/filters/*.hpp)
 
-add_executable(Acquisition ${sources} ${headers} ${filter_src} ${filter_inc} filters/LowPassFilter.cpp filters/LowPassFilter.hpp)
+FILE(GLOB proto_src ${CMAKE_SOURCE_DIR}/proto/*.cc)
+FILE(GLOB proto_inc ${CMAKE_SOURCE_DIR}/proto/*.h)
 
+add_executable(Acquisition ${sources} ${headers} ${filter_src} ${filter_inc} ${proto_src} ${proto_inc})
 target_link_libraries (Acquisition pthread)
 target_link_libraries (Acquisition hiredis)
+target_link_libraries (Acquisition protobuf)
+target_link_libraries (Acquisition czmq)
+target_link_libraries (Acquisition zmq)
+target_link_libraries (Acquisition sodium)

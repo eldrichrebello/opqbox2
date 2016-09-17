@@ -1,4 +1,4 @@
-package opq;
+package opq.proto;
 
 message Cycle{
 	required uint64 time = 1;
@@ -7,5 +7,14 @@ message Cycle{
 
 message DataMesaage{
 	required int32 id = 1;
-	required Cycle cycles = 2;
+	uint64 start = 2;
+	uint64 stop = 3;
+	repeated Cycle cycles = 4;
+}
+
+message TriggerMessage{
+	required int32 id = 1;
+	required float frequency = 2;
+	required float rms = 3;
+	repeated int32 histogram = 4;
 }

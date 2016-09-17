@@ -163,6 +163,30 @@ filters/LowPassFilter.cpp.s:
 	$(MAKE) -f CMakeFiles/Acquisition.dir/build.make CMakeFiles/Acquisition.dir/filters/LowPassFilter.cpp.s
 .PHONY : filters/LowPassFilter.cpp.s
 
+proto/opq.pb.o: proto/opq.pb.cc.o
+.PHONY : proto/opq.pb.o
+
+# target to build an object file
+proto/opq.pb.cc.o:
+	$(MAKE) -f CMakeFiles/Acquisition.dir/build.make CMakeFiles/Acquisition.dir/proto/opq.pb.cc.o
+.PHONY : proto/opq.pb.cc.o
+
+proto/opq.pb.i: proto/opq.pb.cc.i
+.PHONY : proto/opq.pb.i
+
+# target to preprocess a source file
+proto/opq.pb.cc.i:
+	$(MAKE) -f CMakeFiles/Acquisition.dir/build.make CMakeFiles/Acquisition.dir/proto/opq.pb.cc.i
+.PHONY : proto/opq.pb.cc.i
+
+proto/opq.pb.s: proto/opq.pb.cc.s
+.PHONY : proto/opq.pb.s
+
+# target to generate assembly for a file
+proto/opq.pb.cc.s:
+	$(MAKE) -f CMakeFiles/Acquisition.dir/build.make CMakeFiles/Acquisition.dir/proto/opq.pb.cc.s
+.PHONY : proto/opq.pb.cc.s
+
 src/LocalAnalysis.o: src/LocalAnalysis.cpp.o
 .PHONY : src/LocalAnalysis.o
 
@@ -259,6 +283,30 @@ src/Settings.cpp.s:
 	$(MAKE) -f CMakeFiles/Acquisition.dir/build.make CMakeFiles/Acquisition.dir/src/Settings.cpp.s
 .PHONY : src/Settings.cpp.s
 
+src/ZMQTrigger.o: src/ZMQTrigger.cpp.o
+.PHONY : src/ZMQTrigger.o
+
+# target to build an object file
+src/ZMQTrigger.cpp.o:
+	$(MAKE) -f CMakeFiles/Acquisition.dir/build.make CMakeFiles/Acquisition.dir/src/ZMQTrigger.cpp.o
+.PHONY : src/ZMQTrigger.cpp.o
+
+src/ZMQTrigger.i: src/ZMQTrigger.cpp.i
+.PHONY : src/ZMQTrigger.i
+
+# target to preprocess a source file
+src/ZMQTrigger.cpp.i:
+	$(MAKE) -f CMakeFiles/Acquisition.dir/build.make CMakeFiles/Acquisition.dir/src/ZMQTrigger.cpp.i
+.PHONY : src/ZMQTrigger.cpp.i
+
+src/ZMQTrigger.s: src/ZMQTrigger.cpp.s
+.PHONY : src/ZMQTrigger.s
+
+# target to generate assembly for a file
+src/ZMQTrigger.cpp.s:
+	$(MAKE) -f CMakeFiles/Acquisition.dir/build.make CMakeFiles/Acquisition.dir/src/ZMQTrigger.cpp.s
+.PHONY : src/ZMQTrigger.cpp.s
+
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
@@ -298,6 +346,9 @@ help:
 	@echo "... filters/LowPassFilter.o"
 	@echo "... filters/LowPassFilter.i"
 	@echo "... filters/LowPassFilter.s"
+	@echo "... proto/opq.pb.o"
+	@echo "... proto/opq.pb.i"
+	@echo "... proto/opq.pb.s"
 	@echo "... src/LocalAnalysis.o"
 	@echo "... src/LocalAnalysis.i"
 	@echo "... src/LocalAnalysis.s"
@@ -310,6 +361,9 @@ help:
 	@echo "... src/Settings.o"
 	@echo "... src/Settings.i"
 	@echo "... src/Settings.s"
+	@echo "... src/ZMQTrigger.o"
+	@echo "... src/ZMQTrigger.i"
+	@echo "... src/ZMQTrigger.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

@@ -52,9 +52,7 @@ void RedisTrigger::readerLoop() {
     std::string trimCommand = "LTRIM " + triggerKey + " 0 " + std::to_string(_redisRecordLen);
     while (_running) {
         auto message = _q->pop();
-        auto messageBuffer = opq::data::serialize_analysis_trigger(message);
-
-
+        auto messageBuffer = opq::data::serialize_analysis_trigger_redis(message);
         redisAppendCommand(c, "LPUSH %s %s",triggerKey.c_str(), messageBuffer.c_str());
         redisAppendCommand(c, trimCommand.c_str());
         redisGetReply(c,(void**)&reply);

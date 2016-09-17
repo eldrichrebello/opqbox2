@@ -126,7 +126,7 @@ int main(void) {
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
     /* Infinite loop */
     /* USER CODE BEGIN WHILE */
-    char out[10];
+    //char out[10];
     while (1) {
         int8_t data = '?';
         /* USER CODE END WHILE */
@@ -147,7 +147,7 @@ int main(void) {
             uint16_t len = strlen(out);
             HAL_UART_Transmit(&huart1,out,len,0xFFFF);
         }
-         */
+        */
     }
 }
 

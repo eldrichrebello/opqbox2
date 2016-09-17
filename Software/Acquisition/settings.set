@@ -1,10 +1,11 @@
 #device ID
-box_id                      :S  :1234
+box_id                      :I  :1
 #Cycles per sample
 frames_per_measurement      :I  :10
 #Triggering data host and port
-redis_trigger_host          :S  :128.171.10.167
-redis_trigger_port          :I  :6379
-redis_trigger_depth         :I  :600
-redis_auth                  :S  :nicetry
+zmq_host                    :S  :tcp://localhost:9002
+zmq_server_cert             :S  :/home/tusk/.curve/opqserver
+zmq_public_cert             :S  :/home/tusk/.curve/opqclient
+zmq_private_cert            :S  :/home/tusk/temp/opqcert/client_secret
+#zmq_private_cert            :S  :/home/tusk/.curve/opqclient_secret
 acquisition_calibration_constant    :F  :151.34

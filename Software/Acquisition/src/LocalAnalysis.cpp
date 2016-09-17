@@ -5,6 +5,7 @@
 #include "LocalAnalysis.hpp"
 #include "opqdata.hpp"
 #include "Settings.hpp"
+#include <hiredis/hiredis.h>
 
 #include <math.h>
 #include <algorithm>
@@ -82,6 +83,8 @@ void LocalAnalysis::readerLoop() {
                     DECIMATION_FACTOR /
                     accumulator;
             _outQ->push(analysis);
+            //Store sample in redis
+
         }
         else{
             initFilter(m);

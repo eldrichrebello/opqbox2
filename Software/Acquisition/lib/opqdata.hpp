@@ -9,7 +9,6 @@
 
 #include "SyncQueue.hpp"
 
-
 namespace opq{
     namespace data{
         const static int CYCLES_PER_SEC = 60;
@@ -58,7 +57,7 @@ namespace opq{
             return std::make_shared< SyncQueue <OPQAnalysisPtr> >();
         }
 
-        inline std::string serialize_analysis_trigger(OPQAnalysisPtr a){
+        inline std::string serialize_analysis_trigger_redis(OPQAnalysisPtr a){
 
             std::chrono::time_point<std::chrono::high_resolution_clock > epoch;
             auto elapsed = a->start - epoch;
