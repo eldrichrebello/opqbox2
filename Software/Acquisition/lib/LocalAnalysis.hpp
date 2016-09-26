@@ -14,12 +14,27 @@
 #include "opqdata.hpp"
 
 
+
 namespace opq {
+    /**
+     * @brief Analysis thread used in generating triggering information, and storing measurements into a local redis instance.
+     */
     class LocalAnalysis {
     public:
+        /**
+         * Default constructor.
+         * @param inq ADC measuremement Queue.
+         * @param outq Analysis queue.
+         */
         LocalAnalysis(opq::data::MeasurementQueue  inq, opq::data::AnalysisQueue outq);
+        /**
+         * Start the Analysis thread.
+         */
         void start();
-        bool stop();
+        /**
+        * Stop the Analysis thread.
+        */
+        void stop();
     private:
         enum LocalAnalysisState {
             INITIALIZING_DOWNSAMPLING_FILTER,

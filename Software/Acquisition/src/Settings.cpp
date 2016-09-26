@@ -7,6 +7,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/variant.hpp>
+#include <boost/log/trivial.hpp>
 
 using namespace opq;
 
@@ -48,8 +49,10 @@ OPQSetting Settings::getSetting(std::string key) {
 bool Settings::loadFromFile(std::string filename) {
     std::ifstream infile(filename.c_str());
     std::string line;
-    if (!infile.is_open())
+    if (!infile.is_open()) {
+        BOOST_LOG_TRIVIAL(fatal) << "Could not load settings file "+ filename;
         return false;
+    }
     std::unique_lock<std::mutex> mlock(_mutex);
     while (std::getline(infile, line)) {
         std::vector<std::string> strs;
@@ -61,7 +64,7 @@ bool Settings::loadFromFile(std::string filename) {
         std::string key = strs[0];
         std::string type = strs[1];
         std::string value = strs[2];
-        for (int i = 3; i < strs.size(); i++) {
+        for (size_t i = 3; i < strs.size(); i++) {
             value += ":" + strs[i];
         }
         boost::algorithm::trim(key);
@@ -91,7 +94,7 @@ bool Settings::loadFromFile(std::string filename) {
                         setValue = false;
                     break;
                 default:
-                    std::cout << "Bad line " << line << std::endl;
+                    BOOST_LOG_TRIVIAL(warning) <<  filename + " bad line: " + line;
                     throw boost::bad_lexical_cast();
             }
         }
@@ -137,6 +140,7 @@ bool Settings::saveToFile(std::string filename) {
                     }
                     ofile << line << std::endl;
                 }
+    BOOST_LOG_TRIVIAL(info) <<  "exported " << filename;
     return true;
 }
 
@@ -167,11 +171,16 @@ void Settings::clear() {
     _settings.clear();
 }
 
+static void badget(std::string key){
+    BOOST_LOG_TRIVIAL(info) <<  "Tried to access key " << key << " but it was not set or of wrong type";
+}
+
 uint64_t Settings::getUint64(std::string key) {
     try {
         return boost::get<uint64_t>(getSetting(key));
     }
     catch (boost::bad_get &e) {
+        badget(key);
         return 0;
     }
 }
@@ -181,6 +190,7 @@ float Settings::getFloat(std::string key) {
         return boost::get<float>(getSetting(key));
     }
     catch (boost::bad_get &e) {
+        badget(key);
         return 0;
     }
 }
@@ -190,6 +200,7 @@ int Settings::getInt(std::string key) {
         return boost::get<int>(getSetting(key));
     }
     catch (boost::bad_get &e) {
+        badget(key);
         return 0;
     }
 }
@@ -199,6 +210,7 @@ std::string Settings::getString(std::string key) {
         return boost::get<std::string>(getSetting(key));
     }
     catch (boost::bad_get &e) {
+        badget(key);
         return "";
     }
 }
@@ -208,6 +220,7 @@ bool Settings::getBool(std::string key) {
         return boost::get<bool>(getSetting(key));
     }
     catch (boost::bad_get &e) {
+        badget(key);
         return false;
     }
 }
@@ -229,7 +242,8 @@ bool Settings::removeChangeCallback(std::string key, int id) {
     std::unique_lock<std::mutex> mlock(_mutex);
     std::map<std::string, SettingStruct>::iterator pos = _settings.lower_bound(key);
     if (pos == _settings.end() || (_settings.key_comp()(key, pos->first))) {
-        return -1;
+        return false;
     }
     _settings[key].callbacks.erase(id);
+    return true;
 }

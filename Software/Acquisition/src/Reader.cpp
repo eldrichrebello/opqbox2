@@ -12,6 +12,8 @@
 #include "Reader.hpp"
 #include "opqdata.hpp"
 
+#include <boost/log/trivial.hpp>
+
 using namespace std;
 using namespace opq;
 using namespace opq::data;
@@ -27,11 +29,14 @@ using namespace opq::data;
 Reader::Reader(MeasurementQueue &q){
     _q = q;
 #ifndef OPQ_DEBUG
+    BOOST_LOG_TRIVIAL(info) << "Opening /dev/opq0";
     _fd = ::open("/dev/opq0",O_RDONLY);
     if(_fd < 0){
-       throw std::runtime_error("Could not open /dev/opq0");
+       BOOST_LOG_TRIVIAL(fatal) << "Could not open /dev/opq0";
+       exit(0);
     }
 #else
+    BOOST_LOG_TRIVIAL(info) << "Running in simulation mode";
     srand(time(NULL));
 #endif
     auto settings = Settings::Instance();
@@ -48,11 +53,11 @@ Reader::~Reader(){
     settings->removeChangeCallback("frames_per_measurement", _frames_per_measurement);
 }
 
-bool Reader::start(){
+void Reader::start(){
     _t = std::thread([this]{readerLoop();});
 }
 
-bool Reader::stop(){
+void Reader::stop(){
     _running = false;
     _t.join();
 }
@@ -84,6 +89,7 @@ void Reader::readerLoop(){
         }
         _q->push(measurement);
     }
+    BOOST_LOG_TRIVIAL(info) << "Reader thread done";
 }
 
 void Reader::_onFramesPerMeasurementChange(OPQSetting s) {

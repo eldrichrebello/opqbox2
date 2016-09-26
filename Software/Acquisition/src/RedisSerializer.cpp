@@ -10,6 +10,7 @@
 #include <string>
 #include <thread>
 #include <opqdata.hpp>
+#include <boost/log/trivial.hpp>
 
 using namespace opq;
 using namespace std;
@@ -21,9 +22,10 @@ RedisSerializer::RedisSerializer() {
     std::string redisHost = set->getString("redis.host");
     uint16_t redisPort = (uint16_t)set->getInt("redis.port");
     std::string redisPass = set->getString("redis.auth");
-    _redisRecordTTL = (uint16_t)set->getInt("redis.ttl");
-    _redisRecordRotation = (uint16_t)set->getInt("redis.rotation");
+    _redisRecordTTL = set->getInt("redis.ttl");
+    _redisRecordRotation = set->getInt("redis.rotation");
     c = NULL;
+    BOOST_LOG_TRIVIAL(info) << "Connecting to redis " + redisHost + " port " + to_string(redisPort);
     while(c == NULL){
         c = redisConnect(redisHost.c_str(), redisPort);
         if (c != NULL && c->err) {
@@ -33,16 +35,25 @@ RedisSerializer::RedisSerializer() {
         if(c == NULL)
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
+    BOOST_LOG_TRIVIAL(info) << "Connected to redis";
 
-    redisReply* reply = (redisReply*)redisCommand(c, "AUTH %s", redisPass.c_str());
-    if (reply == NULL) {
-        throw std::runtime_error("Could not connect to redis!");
+    redisReply* reply;
+    if(redisPass != ""){
+        reply = (redisReply*)redisCommand(c, "AUTH %s", redisPass.c_str());
+        if (reply == NULL || reply->type == REDIS_REPLY_ERROR) {
+            BOOST_LOG_TRIVIAL(fatal) << "Could not authenticate with redis!";
+            exit(0);
+        }
+        BOOST_LOG_TRIVIAL(info) << "Authenticated with redis";
+        freeReplyObject(reply);
     }
-    freeReplyObject(reply);
+
     reply = (redisReply*)redisCommand(c, "FLUSHALL");
-    if(reply == NULL){
-        throw std::runtime_error("Could not connect to redis!");
+    if(reply == NULL || reply->type == REDIS_REPLY_ERROR){
+        BOOST_LOG_TRIVIAL(fatal) << "Could not authenticate with redis!";
+        exit(0);
     }
+    BOOST_LOG_TRIVIAL(info) << "Cleared Redis database";
     freeReplyObject(reply);
 }
 
@@ -69,14 +80,16 @@ void RedisSerializer::sendToRedis(data::OPQMeasurementPtr measurement) {
     }
     redisReply* reply;
     redisGetReply(c,(void**)&reply);
-    if (reply == NULL) {
-        throw std::runtime_error("Lost connection to redis!");
+    if (reply == NULL || reply->type == REDIS_REPLY_ERROR) {
+        BOOST_LOG_TRIVIAL(fatal) << "Lost connection with redis";
+        exit(0);
     }
     freeReplyObject(reply);
     if(setTTL) {
         redisGetReply(c, (void **) &reply);
-        if (reply == NULL) {
-            throw std::runtime_error("Lost connection to redis!");
+        if (reply == NULL || reply->type == REDIS_REPLY_ERROR) {
+            BOOST_LOG_TRIVIAL(fatal) << "Lost connection with redis";
+            exit(0);
         }
         freeReplyObject(reply);
     }

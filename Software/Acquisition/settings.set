@@ -14,3 +14,5 @@ redis.port                  :I  :6379
 redis.auth                  :S  :kalalau
 redis.ttl                   :I  :10
 redis.rotation              :I  :5
+#logging:
+log.path                    :S  :./acq.log

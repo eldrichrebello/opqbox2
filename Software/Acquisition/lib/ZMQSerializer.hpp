@@ -11,10 +11,25 @@
 #include <czmq.h>
 
 namespace opq {
+    /**
+     * @brief zeromq connector to the acquisition network service.
+     * All of the configuration parameters are loaded via the Settings object.
+     */
     class ZMQSerializer {
     public:
+        /**
+         * @brief Creates a new encrypted ZMQ connection.
+         */
         ZMQSerializer();
+        /**
+         * @brief Closes the ZMQ connection.
+         */
         ~ZMQSerializer();
+
+        /**
+         * @brief Send an analysis result to the network.
+         * @param message message to be sent.
+         */
         void sendToZMQ(data::OPQAnalysisPtr message);
     private:
         int _boxId;
@@ -25,6 +40,7 @@ namespace opq {
         void *client;
     };
 
+    ///@brief Overloaded left shift operator for convenience.
     ZMQSerializer& operator<<(ZMQSerializer& zmq, data::OPQAnalysisPtr message);
 };
 

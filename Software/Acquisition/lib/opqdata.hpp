@@ -8,53 +8,96 @@
 
 #include "SyncQueue.hpp"
 
-namespace opq{
-    namespace data{
+namespace opq {
+
+    /**
+     * Common data types.
+     */
+    namespace data {
+
+        ///Grid cycles per second
         const static int CYCLES_PER_SEC = 60;
+        ///Sampling rate per cycle
         const static int SAMPLES_PER_CYCLE = 200;
         const static int HISTOGRAM_BINS = 100;
-        typedef struct{
+
+        /** @struct OPQCycle
+        *  @brief This structure represents an AC cycle
+        *  @var OPQCycle::data
+        *  Contains 16 bit signed ADC samples
+        *  @var OPQCycle::zero_crossing_high
+        *  Reserved
+        *  @var OPQCycle::zero_crossing_low
+        *  Reserved
+        */
+
+        typedef struct OPQCycle{
             int16_t data[SAMPLES_PER_CYCLE];
             int32_t zero_crossing_high;
             int32_t zero_crossing_low;
         } __attribute__((packed)) OPQCycle;
 
-        typedef struct{
-
+        ///@brief A collection of cycles and their timestamps.
+        typedef struct {
+            ///Contains measurememtns for several cycles.
             std::vector<OPQCycle> cycles;
-            std::vector< std::chrono::time_point<std::chrono::high_resolution_clock > > timestamps;
+            ///Contains timestamps for each measurement.
+            std::vector<std::chrono::time_point<std::chrono::high_resolution_clock> > timestamps;
         } OPQMeasurement;
 
+        ///@brief Smartpointer for OPQMeasurement.
         typedef std::shared_ptr<OPQMeasurement> OPQMeasurementPtr;
 
-        inline OPQMeasurementPtr make_measurement(){
+        /**
+         * @brief Creates an empty OPQMeasurementPtr.
+         * @return empty OPQMeasurementPtr.
+         */
+        inline OPQMeasurementPtr make_measurement() {
             return std::make_shared<OPQMeasurement>();
         }
 
-        typedef std::shared_ptr< SyncQueue <OPQMeasurementPtr> > MeasurementQueue;
+        ///@brief A sycronized queue of OPQMeasurementPtr wrapped in a smart pointer.
+        typedef std::shared_ptr<SyncQueue<OPQMeasurementPtr> > MeasurementQueue;
 
-        inline MeasurementQueue make_measurement_queue(){
-            return std::make_shared< SyncQueue <OPQMeasurementPtr> >();
+        /**
+         * @brief Creates an empty MeasurementQueue.
+         * @return MeasurementQueue.
+         */
+        inline MeasurementQueue make_measurement_queue() {
+            return std::make_shared<SyncQueue<OPQMeasurementPtr> >();
         }
 
+        ///@brief Result of the local analysis thread.
         typedef struct {
+            ///Computed RMS.
             float RMS;
+            ///Computed frequency.
             float frequency;
             uint16_t hist[HISTOGRAM_BINS];
-            std::vector< std::chrono::time_point<std::chrono::high_resolution_clock > > read_time;
-            std::chrono::time_point<std::chrono::high_resolution_clock > start;
+            ///UNIX timestamp of the first opqcycle rtransfer.
+            std::chrono::time_point<std::chrono::high_resolution_clock> start;
         } OPQAnalysis;
 
+        ///@brief Smart pointer of OPQAnalysis.
         typedef std::shared_ptr<OPQAnalysis> OPQAnalysisPtr;
 
-        inline OPQAnalysisPtr make_analysis(){
+        /**
+         * @brief Create an new OPQAnalysisPtr.
+         * @return OPQAnalysisPtr.
+         */
+        inline OPQAnalysisPtr make_analysis() {
             return std::make_shared<OPQAnalysis>();
         }
 
-        typedef std::shared_ptr< SyncQueue <OPQAnalysisPtr> > AnalysisQueue;
+        ///A sycronized queue of OPQAnalysisPtr wrapped in a smart pointer.
+        typedef std::shared_ptr<SyncQueue<OPQAnalysisPtr> > AnalysisQueue;
 
-        inline AnalysisQueue make_analysis_queue(){
-            return std::make_shared< SyncQueue <OPQAnalysisPtr> >();
+        /**
+         * @brief Create a empty AnalysisQueue.
+         * @return AnalysisQueue.
+         */
+        inline AnalysisQueue make_analysis_queue() {
+            return std::make_shared<SyncQueue<OPQAnalysisPtr> >();
         }
 
 

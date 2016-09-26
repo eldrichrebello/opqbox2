@@ -5,14 +5,13 @@
 #include "LocalAnalysis.hpp"
 #include "opqdata.hpp"
 #include "Settings.hpp"
-#include <hiredis/hiredis.h>
 
 #include <math.h>
 #include <algorithm>
 #include <iostream>
 #include <opqdata.hpp>
 #include "RedisSerializer.hpp"
-
+#include <boost/log/trivial.hpp>
 using namespace opq;
 using namespace opq::data;
 using namespace std;
@@ -29,9 +28,10 @@ void LocalAnalysis::start() {
     _t = std::thread([this] { readerLoop(); });
 }
 
-bool LocalAnalysis::stop() {
+void LocalAnalysis::stop() {
     _running = false;
     _t.join();
+
 }
 
 void LocalAnalysis::readerLoop() {
@@ -40,7 +40,7 @@ void LocalAnalysis::readerLoop() {
     float calConstant = settings->getFloat("acquisition_calibration_constant");
 
     RedisSerializer redis;
-
+    BOOST_LOG_TRIVIAL(info) << "Analysis filter setup....";
     while (_running) {
         opq::data::OPQMeasurementPtr measurement = _inQ->pop();
         if (_state != RUNNING) {
@@ -57,7 +57,6 @@ void LocalAnalysis::readerLoop() {
             for (int i = 0; i < SAMPLES_PER_CYCLE; i++) {
                 AntialiasDownsamplingFilter_put(&adf, frame.data[i]);
                 if (i % DECIMATION_FACTOR == 0) {
-
                     float antialiased_value = AntialiasDownsamplingFilter_get(&adf);
                     LowPassFilter_put(&lpf, antialiased_value);
                     _downSampled.push_back(LowPassFilter_get(&lpf));
@@ -72,7 +71,7 @@ void LocalAnalysis::readerLoop() {
         std::vector<float> zeroCrossings;
         float last = FP_NAN;
         float next = 0;
-        for (int i = 0; i < _downSampled.size(); i++) {
+        for (size_t i = 0; i < _downSampled.size(); i++) {
             if (last != FP_NAN) {
                 if (last < 0 && _downSampled[i] > 0) {
                     next = _downSampled[i];
@@ -83,7 +82,7 @@ void LocalAnalysis::readerLoop() {
         }
 
         float accumulator = 0;
-        for (int i = 1; i < zeroCrossings.size(); i++) {
+        for (size_t i = 1; i < zeroCrossings.size(); i++) {
             accumulator += zeroCrossings[i] - zeroCrossings[i - 1];
         }
         accumulator /= zeroCrossings.size() - 1;
@@ -92,11 +91,11 @@ void LocalAnalysis::readerLoop() {
                               DECIMATION_FACTOR /
                               accumulator;
 
-        analysis->read_time = measurement->timestamps;
+        analysis->start = measurement->timestamps.front();
         _outQ->push(analysis);
-        redis.sendToRedis(measurement);
-
+        redis << measurement;
     }
+    BOOST_LOG_TRIVIAL(info) << "Analysis thread done";
 }
 
 
@@ -133,6 +132,7 @@ void LocalAnalysis::initFilter(opq::data::OPQMeasurementPtr &m) {
             }
         }
         if (_samplesProcessed > INITIALIZING_LOWPASS_FILTER) {
+            BOOST_LOG_TRIVIAL(info) << "Analysis filters ready";
             _state = RUNNING;
             _samplesProcessed = 0;
         }

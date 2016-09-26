@@ -5,7 +5,7 @@
 #include "ZMQSerializer.hpp"
 #include "Settings.hpp"
 #include "util.hpp"
-
+#include "boost/log/trivial.hpp"
 using namespace opq;
 
 ZMQSerializer::ZMQSerializer(){
@@ -24,15 +24,17 @@ ZMQSerializer::ZMQSerializer(){
     //Load a cert here
     _server_cert = (zcert_t*)zcert_load(server_cert_path.c_str());
     if(_client_cert == NULL || _server_cert == NULL){
-        throw std::runtime_error("No certificates found");
+        BOOST_LOG_TRIVIAL(fatal) << "Could not load certificates" ;
+        exit(0);
     }
     const char *server_key = zcert_public_txt (_server_cert);
-
     //  Create and connect client socket
     client = zsocket_new (_ctx, ZMQ_PUSH);
     zcert_apply (_client_cert, client);
     zsocket_set_curve_serverkey (client, server_key);
     zsocket_connect (client, host.c_str());
+    BOOST_LOG_TRIVIAL(info) << "Sending data Trigger data to "  + host;
+
     zsys_handler_set(NULL);
 }
 

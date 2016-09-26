@@ -10,7 +10,7 @@
 #include <czmq.h>
 #include <opqdata.hpp>
 #include <string>
-
+#include <boost/log/trivial.hpp>
 using namespace opq;
 
 ZMQTrigger::ZMQTrigger(opq::data::AnalysisQueue q) {
@@ -22,9 +22,10 @@ void ZMQTrigger::start() {
     _t = std::thread([this] { readerLoop(); });
 }
 
-bool ZMQTrigger::stop() {
+void ZMQTrigger::stop() {
     _running = false;
     _t.join();
+
 }
 
 void ZMQTrigger::readerLoop() {
@@ -34,4 +35,5 @@ void ZMQTrigger::readerLoop() {
         auto message = _q->pop();
         zmq << message;
     }
+    BOOST_LOG_TRIVIAL(info) << "ZMQ thread done";
 }
