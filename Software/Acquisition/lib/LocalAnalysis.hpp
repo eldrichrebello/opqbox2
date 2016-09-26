@@ -48,8 +48,6 @@ namespace opq {
         opq::data::AnalysisQueue _outQ;
         bool _running;
         std::thread _t;
-
-
     };
 }
 

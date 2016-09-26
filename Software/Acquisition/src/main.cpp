@@ -3,7 +3,6 @@
 #include "Reader.hpp"
 #include "Settings.hpp"
 #include "LocalAnalysis.hpp"
-#include "RedisTrigger.hpp"
 
 #include <csignal>
 

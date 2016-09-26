@@ -15,7 +15,7 @@
 using namespace std;
 using namespace opq;
 using namespace opq::data;
-#define OPQ_DEBUG
+
 
 #ifdef OPQ_DEBUG
 
@@ -57,16 +57,15 @@ bool Reader::stop(){
     _t.join();
 }
 
-bool Reader::readFrame(opq::data::OPQ_Frame &frame){
+bool Reader::readFrame(opq::data::OPQCycle &frame){
 #ifdef OPQ_DEBUG
     for(int i = 0; i< data::SAMPLES_PER_CYCLE; i++) {
-
         frame.data[i] = 16384*sin(2*M_PI*i/SAMPLES_PER_CYCLE) + rand()%200 - 100;
-        std::this_thread::sleep_for(std::chrono::microseconds(1000000/60/200));
     }
+    std::this_thread::sleep_for(std::chrono::microseconds(1000000/60));
     return true;
 #else
-    if(::read(_fd, &frame, sizeof(data::OPQ_Frame)) != sizeof(data::OPQ_Frame)) return false;
+    if(::read(_fd, &frame, sizeof(data::OPQCycle)) != sizeof(data::OPQCycle)) return false;
         return true;
 #endif
 
@@ -78,9 +77,9 @@ void Reader::readerLoop(){
         int current_frame = 0;
         auto measurement = make_measurement();
         while(current_frame < _frames_per_measurement){
-            measurement->frames.push_back(OPQ_Frame());
-            readFrame(measurement->frames[current_frame]);
-            measurement->read_time.push_back(std::chrono::high_resolution_clock::now());
+            measurement->cycles.push_back(OPQCycle());
+            readFrame(measurement->cycles[current_frame]);
+            measurement->timestamps.push_back(std::chrono::high_resolution_clock::now());
             current_frame++;
         }
         _q->push(measurement);

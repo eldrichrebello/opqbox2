@@ -2,10 +2,9 @@
 #define ACQUISITION_OPQDATA_H
 
 #include <memory>
-#include <chrono>
 #include <string>
 #include <iostream>
-#include <chrono>
+
 
 #include "SyncQueue.hpp"
 
@@ -18,18 +17,18 @@ namespace opq{
             int16_t data[SAMPLES_PER_CYCLE];
             int32_t zero_crossing_high;
             int32_t zero_crossing_low;
-        } __attribute__((packed)) OPQ_Frame;
+        } __attribute__((packed)) OPQCycle;
 
         typedef struct{
 
-            std::vector< OPQ_Frame> frames;
-            std::vector< std::chrono::time_point<std::chrono::high_resolution_clock > > read_time;
-        } OPQ_Measurement;
+            std::vector<OPQCycle> cycles;
+            std::vector< std::chrono::time_point<std::chrono::high_resolution_clock > > timestamps;
+        } OPQMeasurement;
 
-        typedef std::shared_ptr<OPQ_Measurement> OPQMeasurementPtr;
+        typedef std::shared_ptr<OPQMeasurement> OPQMeasurementPtr;
 
         inline OPQMeasurementPtr make_measurement(){
-            return std::make_shared< OPQ_Measurement >();
+            return std::make_shared<OPQMeasurement>();
         }
 
         typedef std::shared_ptr< SyncQueue <OPQMeasurementPtr> > MeasurementQueue;
@@ -42,13 +41,14 @@ namespace opq{
             float RMS;
             float frequency;
             uint16_t hist[HISTOGRAM_BINS];
+            std::vector< std::chrono::time_point<std::chrono::high_resolution_clock > > read_time;
             std::chrono::time_point<std::chrono::high_resolution_clock > start;
-        }OPQ_Analysis;
+        } OPQAnalysis;
 
-        typedef std::shared_ptr<OPQ_Analysis> OPQAnalysisPtr;
+        typedef std::shared_ptr<OPQAnalysis> OPQAnalysisPtr;
 
         inline OPQAnalysisPtr make_analysis(){
-            return std::make_shared< OPQ_Analysis >();
+            return std::make_shared<OPQAnalysis>();
         }
 
         typedef std::shared_ptr< SyncQueue <OPQAnalysisPtr> > AnalysisQueue;
@@ -57,16 +57,6 @@ namespace opq{
             return std::make_shared< SyncQueue <OPQAnalysisPtr> >();
         }
 
-        inline std::string serialize_analysis_trigger_redis(OPQAnalysisPtr a){
-
-            std::chrono::time_point<std::chrono::high_resolution_clock > epoch;
-            auto elapsed = a->start - epoch;
-            uint64_t timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
-            std::string ret = std::to_string(timestamp) +
-                    ":" + std::to_string(a->RMS) +
-                    ":" + std::to_string(a->frequency);
-            return ret;
-        }
 
     }
 }

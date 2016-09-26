@@ -235,29 +235,29 @@ src/Reader.cpp.s:
 	$(MAKE) -f CMakeFiles/Acquisition.dir/build.make CMakeFiles/Acquisition.dir/src/Reader.cpp.s
 .PHONY : src/Reader.cpp.s
 
-src/RedisTrigger.o: src/RedisTrigger.cpp.o
-.PHONY : src/RedisTrigger.o
+src/RedisSerializer.o: src/RedisSerializer.cpp.o
+.PHONY : src/RedisSerializer.o
 
 # target to build an object file
-src/RedisTrigger.cpp.o:
-	$(MAKE) -f CMakeFiles/Acquisition.dir/build.make CMakeFiles/Acquisition.dir/src/RedisTrigger.cpp.o
-.PHONY : src/RedisTrigger.cpp.o
+src/RedisSerializer.cpp.o:
+	$(MAKE) -f CMakeFiles/Acquisition.dir/build.make CMakeFiles/Acquisition.dir/src/RedisSerializer.cpp.o
+.PHONY : src/RedisSerializer.cpp.o
 
-src/RedisTrigger.i: src/RedisTrigger.cpp.i
-.PHONY : src/RedisTrigger.i
+src/RedisSerializer.i: src/RedisSerializer.cpp.i
+.PHONY : src/RedisSerializer.i
 
 # target to preprocess a source file
-src/RedisTrigger.cpp.i:
-	$(MAKE) -f CMakeFiles/Acquisition.dir/build.make CMakeFiles/Acquisition.dir/src/RedisTrigger.cpp.i
-.PHONY : src/RedisTrigger.cpp.i
+src/RedisSerializer.cpp.i:
+	$(MAKE) -f CMakeFiles/Acquisition.dir/build.make CMakeFiles/Acquisition.dir/src/RedisSerializer.cpp.i
+.PHONY : src/RedisSerializer.cpp.i
 
-src/RedisTrigger.s: src/RedisTrigger.cpp.s
-.PHONY : src/RedisTrigger.s
+src/RedisSerializer.s: src/RedisSerializer.cpp.s
+.PHONY : src/RedisSerializer.s
 
 # target to generate assembly for a file
-src/RedisTrigger.cpp.s:
-	$(MAKE) -f CMakeFiles/Acquisition.dir/build.make CMakeFiles/Acquisition.dir/src/RedisTrigger.cpp.s
-.PHONY : src/RedisTrigger.cpp.s
+src/RedisSerializer.cpp.s:
+	$(MAKE) -f CMakeFiles/Acquisition.dir/build.make CMakeFiles/Acquisition.dir/src/RedisSerializer.cpp.s
+.PHONY : src/RedisSerializer.cpp.s
 
 src/Settings.o: src/Settings.cpp.o
 .PHONY : src/Settings.o
@@ -282,6 +282,30 @@ src/Settings.s: src/Settings.cpp.s
 src/Settings.cpp.s:
 	$(MAKE) -f CMakeFiles/Acquisition.dir/build.make CMakeFiles/Acquisition.dir/src/Settings.cpp.s
 .PHONY : src/Settings.cpp.s
+
+src/ZMQSerializer.o: src/ZMQSerializer.cpp.o
+.PHONY : src/ZMQSerializer.o
+
+# target to build an object file
+src/ZMQSerializer.cpp.o:
+	$(MAKE) -f CMakeFiles/Acquisition.dir/build.make CMakeFiles/Acquisition.dir/src/ZMQSerializer.cpp.o
+.PHONY : src/ZMQSerializer.cpp.o
+
+src/ZMQSerializer.i: src/ZMQSerializer.cpp.i
+.PHONY : src/ZMQSerializer.i
+
+# target to preprocess a source file
+src/ZMQSerializer.cpp.i:
+	$(MAKE) -f CMakeFiles/Acquisition.dir/build.make CMakeFiles/Acquisition.dir/src/ZMQSerializer.cpp.i
+.PHONY : src/ZMQSerializer.cpp.i
+
+src/ZMQSerializer.s: src/ZMQSerializer.cpp.s
+.PHONY : src/ZMQSerializer.s
+
+# target to generate assembly for a file
+src/ZMQSerializer.cpp.s:
+	$(MAKE) -f CMakeFiles/Acquisition.dir/build.make CMakeFiles/Acquisition.dir/src/ZMQSerializer.cpp.s
+.PHONY : src/ZMQSerializer.cpp.s
 
 src/ZMQTrigger.o: src/ZMQTrigger.cpp.o
 .PHONY : src/ZMQTrigger.o
@@ -355,12 +379,15 @@ help:
 	@echo "... src/Reader.o"
 	@echo "... src/Reader.i"
 	@echo "... src/Reader.s"
-	@echo "... src/RedisTrigger.o"
-	@echo "... src/RedisTrigger.i"
-	@echo "... src/RedisTrigger.s"
+	@echo "... src/RedisSerializer.o"
+	@echo "... src/RedisSerializer.i"
+	@echo "... src/RedisSerializer.s"
 	@echo "... src/Settings.o"
 	@echo "... src/Settings.i"
 	@echo "... src/Settings.s"
+	@echo "... src/ZMQSerializer.o"
+	@echo "... src/ZMQSerializer.i"
+	@echo "... src/ZMQSerializer.s"
 	@echo "... src/ZMQTrigger.o"
 	@echo "... src/ZMQTrigger.i"
 	@echo "... src/ZMQTrigger.s"

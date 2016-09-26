@@ -21,7 +21,7 @@ namespace opq {
         int _fpm_callback_id;
 
         void readerLoop();
-        bool readFrame(opq::data::OPQ_Frame &frame);
+        bool readFrame(opq::data::OPQCycle &frame);
         opq::data::MeasurementQueue _q;
         int _fd;
         std::thread _t;
