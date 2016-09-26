@@ -1,7 +1,3 @@
-//
-// Created by tusk on 9/25/16.
-//
-
 #ifndef ACQUISITION_ZMQSERIALIZER_HPP
 #define ACQUISITION_ZMQSERIALIZER_HPP
 

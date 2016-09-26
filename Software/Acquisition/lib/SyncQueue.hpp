@@ -1,7 +1,3 @@
-//
-// Created by tusk on 8/15/16.
-//
-
 #ifndef ACQUISITION_LOCKFREEQUEUE_H
 #define ACQUISITION_LOCKFREEQUEUE_H
 

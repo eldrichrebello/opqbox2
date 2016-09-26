@@ -15,6 +15,7 @@
 #include "Settings.hpp"
 #include "LocalAnalysis.hpp"
 #include "version.hpp"
+#include "Pipeline.hpp"
 
 using namespace std;
 using namespace opq;
@@ -74,23 +75,29 @@ int main() {
     //Create the queues and threads.
     auto readerQueue = opq::data::make_measurement_queue();
     auto analysisQueue = opq::data::make_analysis_queue();
-    opq::Reader r(readerQueue);
-    opq::LocalAnalysis l(readerQueue, analysisQueue);
-    opq::ZMQTrigger t(analysisQueue);
+
+    pipeline::Slab readerSlab;
+    opq::Reader reader(readerQueue);
+
+    pipeline::Slab analysisSlab;
+    opq::LocalAnalysis analysis(readerQueue, analysisQueue);
+
+    pipeline::Slab triggerSlab;
+    opq::ZMQTrigger trigger(analysisQueue);
+
     //Start all the threads.
-    t.start();
-    l.start();
-    r.start();
+    triggerSlab.start([&trigger](bool &running) {trigger.loop(running);});
+    readerSlab.start([&reader](bool &running) {reader.loop(running);});
+    analysisSlab.start([&analysis](bool &running) {analysis.loop(running);});
     //Post Signal handler for the interrupt signal
     std::signal(SIGINT, bail_handler);
-    //
+    //Sleep until we catch a signal.
     while(gSignalStatus != 0){
         sleep(1);
     }
-
-    t.stop();
-    l.stop();
-    r.stop();
-    exit(0);
+    //stop all the threads.
+    triggerSlab.stop();
+    analysisSlab.stop();
+    readerSlab.stop();
     return 0;
 }

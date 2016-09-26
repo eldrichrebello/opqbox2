@@ -1,7 +1,3 @@
-//
-// Created by tusk on 6/27/16.
-//
-#include <fcntl.h>
 #include <stdexcept>
 #include <memory>
 #include <unistd.h>
@@ -44,7 +40,6 @@ Reader::Reader(MeasurementQueue &q){
     _fpm_callback_id = settings->onChangeCallback("frames_per_measurement",
     [=](OPQSetting s){this->_onFramesPerMeasurementChange(s);}
     );
-    _running = false;
 }
 
 Reader::~Reader(){
@@ -53,37 +48,16 @@ Reader::~Reader(){
     settings->removeChangeCallback("frames_per_measurement", _frames_per_measurement);
 }
 
-void Reader::start(){
-    _t = std::thread([this]{readerLoop();});
-}
-
-void Reader::stop(){
-    _running = false;
-    _t.join();
-}
-
-bool Reader::readFrame(opq::data::OPQCycle &frame){
-#ifdef OPQ_DEBUG
-    for(int i = 0; i< data::SAMPLES_PER_CYCLE; i++) {
-        frame.data[i] = 16384*sin(2*M_PI*i/SAMPLES_PER_CYCLE) + rand()%200 - 100;
-    }
-    std::this_thread::sleep_for(std::chrono::microseconds(1000000/60));
-    return true;
-#else
-    if(::read(_fd, &frame, sizeof(data::OPQCycle)) != sizeof(data::OPQCycle)) return false;
-        return true;
-#endif
-
-}
-
-void Reader::readerLoop(){
-    _running = true;
-    while(_running){
+void Reader::loop(bool &running){
+    while(running){
         int current_frame = 0;
         auto measurement = make_measurement();
         while(current_frame < _frames_per_measurement){
             measurement->cycles.push_back(OPQCycle());
-            readFrame(measurement->cycles[current_frame]);
+            if(!data::readCycle(_fd, measurement->cycles[current_frame])){
+                BOOST_LOG_TRIVIAL(fatal) << "Could not communicate with driver.";
+                exit(0);
+            }
             measurement->timestamps.push_back(std::chrono::high_resolution_clock::now());
             current_frame++;
         }

@@ -1,7 +1,3 @@
-//
-// Created by tusk on 9/25/16.
-//
-
 #include "RedisSerializer.hpp"
 #include "Settings.hpp"
 #include "util.hpp"

@@ -1,7 +1,3 @@
-//
-// Created by tusk on 9/14/16.
-//
-
 #ifndef ACQUISITION_ZMQTRIGGER_HPP
 #define ACQUISITION_ZMQTRIGGER_HPP
 
@@ -22,24 +18,11 @@ namespace opq {
          */
         ZMQTrigger(opq::data::AnalysisQueue q);
 
-        /**
-         * @brief Start the ZMQ thread.
-         */
-        void start();
+        void loop(bool &running);
 
-        /**
-         * @brief Stop the ZMQ thread.
-         */
-        void stop();
     private:
         int _boxId;
-
-        std::thread _t;
-        bool _running;
-
-        void readerLoop();
         opq::data::AnalysisQueue _q;
-
         std::string _host;
         std::string _server_cert_path;
         std::string _private_cert_path;

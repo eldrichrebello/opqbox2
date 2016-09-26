@@ -17,7 +17,7 @@ FILE(GLOB filter_inc ${CMAKE_SOURCE_DIR}/filters/*.hpp)
 FILE(GLOB proto_src ${CMAKE_SOURCE_DIR}/proto/*.cc)
 FILE(GLOB proto_inc ${CMAKE_SOURCE_DIR}/proto/*.h)
 
-add_executable(Acquisition ${sources} ${headers} ${filter_src} ${filter_inc} ${proto_src} ${proto_inc} lib/version.hpp)
+add_executable(Acquisition ${sources} ${headers} ${filter_src} ${filter_inc} ${proto_src} ${proto_inc} lib/version.hpp lib/Pipeline.hpp)
 target_link_libraries (Acquisition pthread)
 target_link_libraries (Acquisition hiredis)
 target_link_libraries (Acquisition protobuf)

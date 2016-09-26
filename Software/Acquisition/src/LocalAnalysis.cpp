@@ -1,7 +1,3 @@
-//
-// Created by tusk on 8/17/16.
-//
-
 #include "LocalAnalysis.hpp"
 #include "opqdata.hpp"
 #include "Settings.hpp"
@@ -24,24 +20,13 @@ LocalAnalysis::LocalAnalysis(opq::data::MeasurementQueue inQ, opq::data::Analysi
     LowPassFilter_init(&lpf);
 }
 
-void LocalAnalysis::start() {
-    _t = std::thread([this] { readerLoop(); });
-}
-
-void LocalAnalysis::stop() {
-    _running = false;
-    _t.join();
-
-}
-
-void LocalAnalysis::readerLoop() {
-    _running = true;
+void LocalAnalysis::loop(bool &running) {
     auto settings = Settings::Instance();
     float calConstant = settings->getFloat("acquisition_calibration_constant");
 
     RedisSerializer redis;
     BOOST_LOG_TRIVIAL(info) << "Analysis filter setup....";
-    while (_running) {
+    while (running) {
         opq::data::OPQMeasurementPtr measurement = _inQ->pop();
         if (_state != RUNNING) {
             initFilter(measurement);

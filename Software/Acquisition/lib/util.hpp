@@ -1,7 +1,3 @@
-//
-// Created by tusk on 8/18/16.
-//
-
 #ifndef ACQUISITION_UTILL_HPP
 #define ACQUISITION_UTILL_HPP
 #include <string>

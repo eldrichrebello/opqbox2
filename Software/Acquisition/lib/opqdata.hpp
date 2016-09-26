@@ -4,9 +4,10 @@
 #include <memory>
 #include <string>
 #include <iostream>
-
-
+#include <unistd.h>
+#include <cmath>
 #include "SyncQueue.hpp"
+
 
 namespace opq {
 
@@ -36,6 +37,19 @@ namespace opq {
             int32_t zero_crossing_high;
             int32_t zero_crossing_low;
         } __attribute__((packed)) OPQCycle;
+
+        inline bool readCycle(int fd, opq::data::OPQCycle &cycle){
+#ifdef OPQ_DEBUG
+            for(int i = 0; i< data::SAMPLES_PER_CYCLE; i++) {
+                cycle.data[i] = 16384*sin(2*M_PI*i/SAMPLES_PER_CYCLE) + rand()%200 - 100;
+            }
+            std::this_thread::sleep_for(std::chrono::microseconds(1000000/60));
+            return true;
+#else
+            if(::read(fd, &cycle, sizeof(data::OPQCycle)) != sizeof(data::OPQCycle)) return false;
+            return true;
+#endif
+        }
 
         ///@brief A collection of cycles and their timestamps.
         typedef struct {

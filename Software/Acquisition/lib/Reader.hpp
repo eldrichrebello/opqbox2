@@ -1,6 +1,3 @@
-//
-// Created by tusk on 6/27/16.
-//
 #ifndef ACQUISITION_READER_H
 #define ACQUISITION_READER_H
 #include "opqdata.hpp"
@@ -23,26 +20,16 @@ namespace opq {
          * @brief  Close the device and release the queue.
          */
         ~Reader();
-        /**
-         * @brief  Start the readout thread.
-         */
-        void start();
-        /**
-         * @brief Stop the readout thread.
-         */
-        void stop();
+
+        void loop(bool &loop);
+
     private:
         void _onFramesPerMeasurementChange(OPQSetting s);
 
         int _frames_per_measurement;
         int _fpm_callback_id;
-
-        void readerLoop();
-        bool readFrame(opq::data::OPQCycle &frame);
         opq::data::MeasurementQueue _q;
         int _fd;
-        std::thread _t;
-        bool _running;
     };
 
 }

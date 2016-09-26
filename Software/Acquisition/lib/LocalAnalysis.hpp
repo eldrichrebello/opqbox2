@@ -1,7 +1,3 @@
-//
-// Created by tusk on 8/17/16.
-//
-
 #ifndef ACQUISITION_METRICS_H
 #define ACQUISITION_METRICS_H
 
@@ -27,15 +23,15 @@ namespace opq {
          * @param outq Analysis queue.
          */
         LocalAnalysis(opq::data::MeasurementQueue  inq, opq::data::AnalysisQueue outq);
+
         /**
-         * Start the Analysis thread.
+         * @brief main loop.
          */
-        void start();
-        /**
-        * Stop the Analysis thread.
-        */
-        void stop();
+        void loop(bool&running);
+
+
     private:
+        ///State machine which initializes the two low pass filters.
         enum LocalAnalysisState {
             INITIALIZING_DOWNSAMPLING_FILTER,
             INITIALIZING_LOWPASS_FILTER,
@@ -45,24 +41,37 @@ namespace opq {
         LocalAnalysisState _state;
 
 
-        void readerLoop();
+        /**
+         * Calculates true rms voltage.
+         * @param data adc samples.
+         * @return rms voltage.
+         */
         float rmsVoltage(int16_t data[]);
 
+        ///How many samples get tossed during downsampling
         static const uint16_t DECIMATION_FACTOR = 10;
+
+        /**
+         * Run an itteration of filter initialization.
+         * @param m several cycle measurement.
+         */
         void initFilter(opq::data::OPQMeasurementPtr &m);
 
-        uint32_t _samplesProcessed;
-        AntialiasDownsamplingFilter adf;
 
+        uint32_t _samplesProcessed;
+
+        //Third party filters.
+        AntialiasDownsamplingFilter adf;
         LowPassFilter lpf;
 
+        //Buffer used for the lpf.
         std::vector<float> _downSampled;
         void calculateFrequency();
 
+        ///Input queue.
         opq::data::MeasurementQueue _inQ;
+        ///Output queue.
         opq::data::AnalysisQueue _outQ;
-        bool _running;
-        std::thread _t;
     };
 }
 

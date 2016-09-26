@@ -1,7 +1,3 @@
-//
-// Created by tusk on 9/14/16.
-//
-
 #include "ZMQTrigger.hpp"
 #include "ZMQSerializer.hpp"
 #include "Settings.hpp"
@@ -15,23 +11,12 @@ using namespace opq;
 
 ZMQTrigger::ZMQTrigger(opq::data::AnalysisQueue q) {
     _q = q;
-    _running = false;
 }
 
-void ZMQTrigger::start() {
-    _t = std::thread([this] { readerLoop(); });
-}
 
-void ZMQTrigger::stop() {
-    _running = false;
-    _t.join();
-
-}
-
-void ZMQTrigger::readerLoop() {
-    _running = true;
+void ZMQTrigger::loop(bool &running) {
     ZMQSerializer zmq;
-    while (_running) {
+    while (running) {
         auto message = _q->pop();
         zmq << message;
     }
