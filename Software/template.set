@@ -13,8 +13,8 @@ zmq.private_cert            :S  :/home/tusk/.curve/opqclient_secret
 redis.host                  :S  :127.0.0.1
 redis.port                  :I  :6379
 redis.auth                  :S  :kalalau
-redis.ttl                   :I  :10
-redis.rotation              :I  :5
+redis.ttl                   :I  :100
+redis.rotation              :I  :10
 #logging:
 log.trg_path                    :S  :./trg.log
-log.acq_path1                    :S  :./acq.log
+log.acq_path                    :S  :./acq.log

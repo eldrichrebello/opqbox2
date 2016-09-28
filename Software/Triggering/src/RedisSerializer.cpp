@@ -69,10 +69,10 @@ void RedisSerializer::sendToRedis(data::OPQMeasurementPtr measurement) {
         setTTL = true;
         _key = std::to_string(util::crono_to_mili(measurement->timestamps[0]));
     }
-    redisAppendCommand(c, "LPUSH %s %s",_key.c_str(), message.c_str());
+    redisAppendCommand(c, "LPUSH %s %b",_key.c_str(), message.c_str(), message.length());
     if(setTTL){
         string ttlCmd = "EXPIRE " + _key + " " + std::to_string(_redisRecordTTL);
-        redisAppendCommand(c, ttlCmd.c_str());
+        redisAppendCommand(c, ttlCmd.c_str(), ttlCmd.length());
     }
     redisReply* reply;
     redisGetReply(c,(void**)&reply);

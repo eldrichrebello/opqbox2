@@ -59,7 +59,7 @@ int main() {
     settings->loadFromFile("settings.set");
 
     //Set up the log.
-    string logPath = settings->getString("log.path");
+    string logPath = settings->getString("log.trg_path");
     if(logPath == "")
         logPath = "log.txt";
 

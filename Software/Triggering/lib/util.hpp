@@ -50,7 +50,7 @@ namespace opq{
          * @return string containing a serialized data::OPQMeasurementPtr.
          */
         inline string serialize_to_protobuf(int id, data::OPQMeasurementPtr message){
-            proto::DataMesaage protomessage;
+            proto::DataMessage protomessage;
             protomessage.set_id(id);
             for (size_t mnum = 0; mnum< message->cycles.size();mnum++){
                 auto &cycle = message->cycles[mnum];

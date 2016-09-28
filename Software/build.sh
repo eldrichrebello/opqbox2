@@ -8,9 +8,10 @@ cd ..
 
 #Build protocol files
 mkdir -p Acquisition/proto
-protoc -I=proto/ --cpp_out=Acquisition/proto proto/opq.proto
+protoc -I=proto/ --cpp_out=Triggering/proto proto/opq.proto
+protoc -I=proto/ --python_out=Acquisition/ proto/opq.proto
 
 cd Acquisition
 	make 
-#	sudo make install
+	sudo make install
 cd ..

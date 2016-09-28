@@ -1,21 +1,19 @@
 import os
 from bottle import route, run, static_file, template, request, redirect, post
-from net import get_ssids, connect_to_network
-
 
 @route('/js/<filename>')
 def js_static(filename):
-    return static_file(filename, root='/home/pi/opqbox2/pypi/server/js')
+    return static_file(filename, root='./server/js')
 
 
 @route('/img/<filename>')
 def img_static(filename):
-    return static_file(filename, root='/home/pi/opqbox2/pypi/server/img')
+    return static_file(filename, root='./server/img')
 
 
 @route('/css/<filename>')
 def img_static(filename):
-    return static_file(filename, root='/home/pi/opqbox2/pypi/server/css')
+    return static_file(filename, root='./server/css')
 
 
 @route("/")
@@ -62,3 +60,5 @@ def connect():
 def run_server(host='0.0.0.0', port=5000):
     port = int(os.environ.get("PORT", port))
     run(host=host, port=port)
+
+run_server()

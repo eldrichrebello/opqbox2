@@ -7,7 +7,7 @@ using namespace opq;
 ZMQSerializer::ZMQSerializer(){
     Settings *set = Settings::Instance();
     _boxId = set->getInt("box_id");
-    std::string host = set->getString("zmq.host");;
+    std::string host = set->getString("zmq.trigger_host");;
     std::string server_cert_path = set->getString("zmq.server_cert");;
     std::string private_cert_path = set->getString("zmq.private_cert");
 

@@ -5,9 +5,10 @@ message Cycle{
 	repeated int32 data = 2;
 }
 
-message DataMesaage{
+message DataMessage{
 	required int32 id = 1;
-	repeated Cycle cycles = 4;
+	optional int32 mid = 2;
+	repeated Cycle cycles = 3;
 }
 
 message TriggerMessage{
@@ -16,4 +17,18 @@ message TriggerMessage{
 	required float frequency = 3;
 	required float rms = 4;
 	repeated int32 histogram = 5;
+}
+
+message RequestDataMessage{
+	enum RequestType {
+	    PING = 1;
+	    PONG = 2;
+	    READ = 3;
+	    ERROR = 4;
+ 	}
+	required RequestType type = 1;
+	optional uint64 time = 2;
+	optional int32 back = 3;
+	optional int32 forward = 4;
+	required int32 mid = 5;
 }
