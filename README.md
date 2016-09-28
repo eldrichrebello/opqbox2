@@ -30,7 +30,7 @@ We performed a [pilot study of our first generation hardware and software](http:
 
 * **Connectivity.** OPQBox2 is designed to be the deployed as a part of a distributed real-time power quality monitoring network. As such it offers a large number of interface options, including serial, USB, WIFI and cellular network. The initial development will focus on WIFI, and serial communication.
   
-# Changes From OPQBox1
+# Changes From OPQBox Version 1
 
 OPQBox2 is a complete redesign from the previous generation. It replaces the voltage sensing transformer with an isolation amplifier. The sampling rate has increased from 4kSPS to up to 100kSPS. In order to keep up with the faster acquisition a dedicated ARM DSP is used to control the sampling and realtime processing. Here is a summary of component changes in OPQBox2:
 
