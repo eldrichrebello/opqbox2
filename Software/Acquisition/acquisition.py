@@ -1,4 +1,5 @@
 import logging
+import sys
 import signal
 import os
 from settings import Settings
@@ -13,24 +14,30 @@ def handler(signum, frame):
 def main():
     signal.signal(signal.SIGINT, handler)
 
+    settings_file = "/etc/opq/settings.set"
+    if len(sys.argv) < 2:
+        logging.info("No command line argument. Trying /etc/opq/settings.set")
+    else:
+        settings_file = sys.argv[1]
+
     settings = Settings()
-    settings.loadFile("settings.set")
+    settings.loadFile(settings_file)
+
     log_path = settings.getKey("log.acq_path")
     if not log_path:
         log_path = "acq.txt"
     logging.basicConfig(filename=log_path, level=logging.INFO)
-    # define a Handler which writes INFO messages or higher to the sys.stderr
+    #Console logging
     console = logging.StreamHandler()
     console.setLevel(logging.INFO)
-    # set a format which is simpler for console use
     formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
-    # tell the handler to use this format
     console.setFormatter(formatter)
-    # add the handler to the root logger
     logging.getLogger('').addHandler(console)
-    logging.info("Staring up")
+
     zmq = ZmqListener(settings)
     zmq.run()
 
+if __name__ == "__main__":
+    main()
 
-main()
+

@@ -5,7 +5,7 @@ frames_per_measurement      :I  :10
 #Calibration constant
 acquisition_calibration_constant    :F  :151.34
 #Triggering data host and port
-zmq.trigger_host                    :S  :tcp://localhost:9002
+zmq.trigger_host                    :S  :tcp://localhost:9003
 zmq.acq_host                    :S  :tcp://localhost:9002
 zmq.server_cert             :S  :/home/tusk/.curve/opqserver
 zmq.private_cert            :S  :/home/tusk/.curve/opqclient_secret

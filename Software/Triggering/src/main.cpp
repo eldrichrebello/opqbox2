@@ -39,12 +39,12 @@ namespace
  */
 void bail_handler( int signum )
 {
-    BOOST_LOG_TRIVIAL(fatal) << "Caught SIGINT. Exiting.";
+    BOOST_LOG_TRIVIAL(fatal) << "Triggering: Caught SIGINT. Exiting.";
     cout << "Exiting" << endl;
     gSignalStatus = 0;
 }
 
-int main() {
+int main(int argc, char** argv) {
     gSignalStatus = 1;
 
     //Enable logging to console while we set up the log.
@@ -55,8 +55,19 @@ int main() {
 
     //Load the settings file.
     boost::log::add_console_log(std::cerr, keywords::format = "[%TimeStamp%]: %Message%");
+
+    string setting_file;
+    if(argc < 2){
+        BOOST_LOG_TRIVIAL(warning) << "Started with no arguments. Attempting to load /etc/opq/settings.set";
+        setting_file = "/etc/opq/settings.set";
+    } else {
+        setting_file = argv[1];
+    }
+
     auto settings = opq::Settings::Instance();
-    settings->loadFromFile("settings.set");
+    if(!settings->loadFromFile(setting_file)){
+        return 1;
+    }
 
     //Set up the log.
     string logPath = settings->getString("log.trg_path");
@@ -70,7 +81,7 @@ int main() {
             keywords::min_free_space = 100 * 1024 * 1024
     );
 
-    BOOST_LOG_TRIVIAL(info) << "Acquisition " << opq::OPQ_ACQ_MAJOR_VERSION << "." << opq::OPQ_ACQ_MINOR_VERSION;
+    BOOST_LOG_TRIVIAL(info) << "Triggering " << opq::OPQ_TRG_MAJOR_VERSION << "." << opq::OPQ_TRG_MINOR_VERSION;
 
     //Create the queues and threads.
     auto readerQueue = opq::data::make_measurement_queue();
