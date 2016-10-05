@@ -27,7 +27,7 @@ class ZmqListener:
         self.auth = ThreadAuthenticator(self.ctx)
         self.auth.start()
 
-        self.auth.allow('127.0.0.1')
+        #self.auth.allow('127.0.0.1')
         self.auth.configure_curve(domain='*', location=zmq.auth.CURVE_ALLOW_ANY)
 
         self.client = self.ctx.socket(zmq.REP)
