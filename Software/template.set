@@ -1,5 +1,5 @@
 #device ID
-box_id                      :I  :1
+box_id                      :I  :2
 #Cycles per sample
 frames_per_measurement      :I  :10
 #Calibration constant
@@ -7,8 +7,8 @@ acquisition_calibration_constant    :F  :151.34
 #Triggering data host and port
 zmq.trigger_host                    :S  :tcp://localhost:9003
 zmq.acq_host                    :S  :tcp://localhost:9002
-zmq.server_cert             :S  :/home/tusk/.curve/opqserver
-zmq.private_cert            :S  :/home/tusk/.curve/opqclient_secret
+zmq.server_cert             :S  :/home/tusk/.curve/public_keys/opqserver.key
+zmq.private_cert            :S  :/home/tusk/.curve/private_keys/opqclient_secret
 #Highres event storage
 redis.host                  :S  :127.0.0.1
 redis.port                  :I  :6379

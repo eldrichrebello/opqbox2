@@ -29,11 +29,12 @@ namespace opq {
         void sendToZMQ(data::OPQAnalysisPtr message);
     private:
         int _boxId;
+        std::string _idString;
         zctx_t *_ctx;
         zauth_t *_auth;
         zcert_t *_client_cert;
         zcert_t *_server_cert;
-        void *client;
+        void *_client;
     };
 
     ///@brief Overloaded left shift operator for convenience.

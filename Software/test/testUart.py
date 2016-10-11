@@ -3,7 +3,7 @@ import serial
 import sys
 import time
 
-sys.path.append('../DSP')
+sys.path.append('../DSPutill')
 import isp
 
 #Here we test the in system programing and the UART communication.
