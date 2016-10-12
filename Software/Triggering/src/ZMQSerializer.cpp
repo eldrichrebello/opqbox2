@@ -47,7 +47,10 @@ ZMQSerializer::~ZMQSerializer(){
 void ZMQSerializer::sendToZMQ(data::OPQAnalysisPtr message){
     std::string out = util::serialize_to_protobuf(_boxId,message);
     zstr_sendm(_client, _idString.c_str());
-    zstr_send(_client, out.c_str());
+    auto  msg = zmsg_new();
+    zmsg_pushmem (msg, out.c_str(), out.length());
+    zmsg_send(&msg, _client);
+    //zstr_send(_client, out.c_str(), out.length());
 }
 
 ZMQSerializer& opq::operator<<(ZMQSerializer& zmq, data::OPQAnalysisPtr message)

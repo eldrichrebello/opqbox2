@@ -18,6 +18,7 @@ FILE(GLOB proto_src ${CMAKE_SOURCE_DIR}/proto/*.cc)
 FILE(GLOB proto_inc ${CMAKE_SOURCE_DIR}/proto/*.h)
 
 add_executable(Triggering ${sources} ${headers} ${filter_src} ${filter_inc} ${proto_src} ${proto_inc} lib/version.hpp lib/Pipeline.hpp)
+link_directories(/usr/local/lib)
 target_link_libraries (Triggering pthread)
 target_link_libraries (Triggering hiredis)
 target_link_libraries (Triggering protobuf)

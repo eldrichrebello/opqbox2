@@ -80,7 +80,6 @@ class ZmqListener:
 
     def run(self):
         self.running = True
-        logger1 = logging.getLogger('ZMQ')
         try:
             while self.running:
                 message_buff = self.client.recv()
