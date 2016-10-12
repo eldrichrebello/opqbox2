@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 TRIGGERING_BUILD_DIR="./Triggering/build/"
 TRIGGERING_DOCS_DIR="./docs/Triggering"
+FIRMWARE_DIR="../Firmware"
+FIRMWARE_DOCS_DIR="./docs/Firmware"
 SRC_DIR=$(pwd)
 
 #Building kernel files
@@ -35,10 +37,37 @@ fi
 
 cd ${TRIGGERING_DOCS_DIR}
 	echo Creating Doxygen Config file
-	doxygen -g
+	doxygen -s -g
 	echo Editing Project Name, Input Source, and Disabling Latex Output
 	sed -i 's;PROJECT_NAME           = "My Project";PROJECT_NAME           = "Triggering";' Doxyfile
 	sed -i 's;INPUT                  =;INPUT                  = ../../Triggering/lib;' Doxyfile
 	sed -i 's;GENERATE_LATEX         = YES;GENERATE_LATEX         = NO;' Doxyfile
-	doxygen Doxyfile
+	echo Generating Documentation for Triggering in ${TRIGGERING_DOCS_DIR}
+	doxygen Doxyfile >> /dev/null
+cd ${SRC_DIR}
+
+#Build Firmware files
+cd ${FIRMWARE_DIR}
+	cmake .
+	echo Building test files
+	make tests >> /dev/null
+	echo Building opq.bin
+	make opq.bin >> /dev/null
+cd ${SRC_DIR}
+
+#Create Firmware Documentation Directory and Generate Documentation
+if [ ! -d ${FIRMWARE_DOCS_DIR} ]; then
+	echo Creating docs directory for Firmware ${FIRMWARE_DOCS_DIR}
+	mkdir -p ${FIRMWARE_DOCS_DIR}
+fi
+
+cd ${FIRMWARE_DOCS_DIR}
+	echo Creating Doxygen Config file
+	doxygen -s -g
+	echo Editing Project Name, Input Source, and Disabling Latex Output
+	sed -i 's;PROJECT_NAME           = "My Project";PROJECT_NAME           = "Firmware";' Doxyfile
+	sed -i 's;INPUT                  =;INPUT                  = ../../../Firmware/Inc/peripheral_config.h ../../../Firmware/Inc/runtime_config.h;' Doxyfile
+	sed -i 's;GENERATE_LATEX         = YES;GENERATE_LATEX         = NO;' Doxyfile
+	echo Generating Documentation for Firmware in ${FIRMWARE_DOCS_DIR}
+	doxygen Doxyfile >> /dev/null
 cd ${SRC_DIR}
