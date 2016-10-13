@@ -19,7 +19,7 @@
 
   <body>    
    <div class="container">
-  <h2>Table Testing</h2>                        
+  <h2>Wifi Access Points</h2>
   <table class="table table-striped table-hover">
     <thead>
       <tr>
@@ -32,10 +32,10 @@
 
 %length_ssid = len(ssids)
 %for i in range(length_ssid):
-      <tr id = tableRow data-toggle="modal" data-target="#{{ssid[i][1]}}"  onclick="mSSID({{i}})">
+      <tr id = tableRow data-toggle="modal" data-target="#{{ssids[i][1]}}"  onclick="mSSID({{i}})">
         <td>{{i+1}}</td>
-        <td id= "tableCol_SSID{{i}}">{{ssid[i][0]}}</td>
-        <td id= "tableCol_type{{i}}">{{ssid[i][1]}}</td>
+        <td id= "tableCol_SSID{{i}}">{{ssids[i][0]}}</td>
+        <td id= "tableCol_type{{i}}">{{ssids[i][1]}}</td>
       </tr>
 %end
     </tbody>
@@ -128,7 +128,8 @@
     <!-- Placed at the end of the document so the pages load faster -->
 
       <script src="/js/jquery.min.js"></script>
-
+      <script src="/js/bootstrap.min.js"></script>
+       <script>
 
        function resetFunction() {
           document.getElementById("pwdWEP").value = '';
@@ -136,7 +137,6 @@
         }
 
       function mSSID(indexSSID){
-
           if(document.getElementById("tableCol_type"+indexSSID).innerHTML=='OPEN'){
             document.getElementById("idOPEN").value = document.getElementById("tableCol_SSID"+indexSSID).innerHTML;
             }

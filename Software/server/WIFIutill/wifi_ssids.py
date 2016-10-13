@@ -8,9 +8,10 @@
 # http://projects.gnome.org/NetworkManager/developers/settings-spec-08.html
 
 import dbus
-import time
 
-def get_ssids():
+
+
+def wifi_ssids():
     bus = dbus.SystemBus()
     manager_bus_object = bus.get_object("org.freedesktop.NetworkManager",
                                         "/org/freedesktop/NetworkManager")
@@ -22,7 +23,6 @@ def get_ssids():
     # method to obtain a list of all devices, and then iterate over these
     # devices to check if DeviceType property equals NM_DEVICE_TYPE_WIFI (2).
     device_path = manager.GetDeviceByIpIface("wlan0")
-    print "wlan0 path: ", device_path
 
     # Connect to the device's Wireless interface and obtain list of access
     # points.
@@ -50,13 +50,10 @@ def get_ssids():
         # string.
         str_ap_ssid = "".join(chr(i) for i in ap_ssid)
         if security == 0:
-	    ssids.append((str_ap_ssid, "NONE", ap_strength))
-            print "SSID = ", str_ap_ssid , " Security = NONE ", ap_strength , "%" 
+            ssids.append((str_ap_ssid, "NONE", ap_strength))
         elif security & (0x1 | 0x2 | 0x10 | 0x20):
             ssids.append((str_ap_ssid, "WEP", ap_strength))
-            print "SSID = ", str_ap_ssid , " Security = WEP", ap_strength , "%" 
         else:
             ssids.append((str_ap_ssid, "WPA", ap_strength))
-            print "SSID = ", str_ap_ssid , " Security = WPA", ap_strength , "%"
 
-     return ssids 
+    return ssids

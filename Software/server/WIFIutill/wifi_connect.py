@@ -25,41 +25,45 @@
 #
 
 import dbus, sys, time
+import md5, uuid
 
-our_uuid = '2b0d0f1d-b79d-43af-bde1-7174462564EE'
 
-s_con = dbus.Dictionary({
-    'type': '802-11-wireless',
-    'uuid': our_uuid,
-    'id': 'OPQ'})
+def wifi_connect(ssid, iface="wlan0"):
+    m = md5.new()
+    m.update(ssid["ssid"])
+    id = uuid.UUID(m.hexdigest())
+    our_uuid = str(id)
 
-s_wifi = dbus.Dictionary({
-    'ssid': dbus.ByteArray("OPQBox"),
-    'mode': "ap",
-    'band': "bg",
-    'channel': dbus.UInt32(1)})
+    s_con = dbus.Dictionary({
+        'type': '802-11-wireless',
+        'uuid': our_uuid,
+        'id': ssid["ssid"]})
 
-s_wsec = dbus.Dictionary({
-    'key-mgmt': 'none',
-    'psk': '1234567890'})
+    s_wifi = dbus.Dictionary({
+        'ssid': dbus.ByteArray(ssid["ssid"]),
+        'mode': "infrastructure"
+    })
 
-s_ip4 = dbus.Dictionary({'method': 'shared'})
-s_ip6 = dbus.Dictionary({'method': 'ignore'})
+    s_wsec = dbus.Dictionary({
+        'key-mgmt': 'wpa-psk',
+        'auth-alg': 'open',
+        'psk': ssid["password"]})
 
-con = dbus.Dictionary({
-    'connection': s_con,
-    '802-11-wireless': s_wifi,
-    '802-11-wireless-security': s_wsec,
-    'ipv4': s_ip4,
-    'ipv6': s_ip6
+    s_ip4 = dbus.Dictionary({'method': 'auto'})
+    s_ip6 = dbus.Dictionary({'method': 'auto'})
+
+    con = dbus.Dictionary({
+        'connection': s_con,
+        '802-11-wireless': s_wifi,
+        '802-11-wireless-security': s_wsec,
+        'ipv4': s_ip4,
+        'ipv6': s_ip6
      })
 
-bus = dbus.SystemBus()
-service_name = "org.freedesktop.NetworkManager"
-proxy = bus.get_object(service_name, "/org/freedesktop/NetworkManager/Settings")
-settings = dbus.Interface(proxy, "org.freedesktop.NetworkManager.Settings")
-
-def connect_hotspot(up=True, iface="wlan0"):
+    bus = dbus.SystemBus()
+    service_name = "org.freedesktop.NetworkManager"
+    proxy = bus.get_object(service_name, "/org/freedesktop/NetworkManager/Settings")
+    settings = dbus.Interface(proxy, "org.freedesktop.NetworkManager.Settings")
     iface = iface
     proxy = bus.get_object(service_name, "/org/freedesktop/NetworkManager")
     nm = dbus.Interface(proxy, "org.freedesktop.NetworkManager")
@@ -72,32 +76,31 @@ def connect_hotspot(up=True, iface="wlan0"):
         settings_connection = dbus.Interface(proxy, "org.freedesktop.NetworkManager.Settings.Connection")
         config = settings_connection.GetSettings()
         if config['connection']['uuid'] == our_uuid:
+            settings_connection.Update(con)
             connection_path = path
             break
 
     # If the hotspot connection didn't already exist, add it
     if not connection_path:
         connection_path = settings.AddConnection(con)
-
-    # Now start or stop the hotspot on the requested device
     proxy = bus.get_object(service_name, devpath)
     device = dbus.Interface(proxy, "org.freedesktop.NetworkManager.Device")
-    operation = "up" if up else "down"
-    if operation == "up":
-        acpath = nm.ActivateConnection(connection_path, devpath, "/")
-        proxy = bus.get_object(service_name, acpath)
-        active_props = dbus.Interface(proxy, "org.freedesktop.DBus.Properties")
 
-        # Wait for the hotspot to start up
-        start = time.time()
-        while time.time() < start + 10:
+    acpath = nm.ActivateConnection(connection_path, devpath, "/")
+    proxy = bus.get_object(service_name, acpath)
+    active_props = dbus.Interface(proxy, "org.freedesktop.DBus.Properties")
+
+    # Wait to connect
+    start = time.time()
+    while time.time() < start + 30:
+        try:
             state = active_props.Get("org.freedesktop.NetworkManager.Connection.Active", "State")
             if state == 2:  # NM_ACTIVE_CONNECTION_STATE_ACTIVATED
-                print "Access point started"
-                return
-            time.sleep(1)
-        print "Failed to start access point"
-    elif operation == "down":
-        device.Disconnect()
+                print "Connected to access point"
+                return False
+        except Exception as e:
+            pass
+        time.sleep(1)
+    return True
 
 
