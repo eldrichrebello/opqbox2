@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import time
+import threading
 
 from bottle import route, run, static_file, template, request, redirect, post
 from opqwifi.WIFIutill.wifi_ssids import wifi_ssids
@@ -38,13 +39,14 @@ def connect():
         password = request.forms.get('pwdWPA')
         mSSID = request.forms.get('fWPA')
         wifi_ap(False, "wlan0")
-        wifi_connect({"ssid" : mSSID, "Sec" : "WPA", "password" : password})
+        if not wifi_connect({"ssid" : mSSID, "Sec" : "WPA", "password" : password}):
+            wifi_ap(True, "wlan0")
 
     elif request.POST.get("sub_WEP","").strip():
         password = request.forms.get('pwdWEP')
         mSSID = request.forms.get('fWEP')
-
     redirect("/")
+
 def run_server(host='0.0.0.0', port=5001):
     port = int(os.environ.get("PORT", port))
     run(host=host, port=port)
@@ -52,7 +54,5 @@ def run_server(host='0.0.0.0', port=5001):
 
 time.sleep(10)
 wifi_list = wifi_ssids()
-time.sleep(10)
-if not wifi_check():
-    wifi_ap(True, "wlan0")
+timer = threading.Timer(lambda  : (not wifi_check()) or wifi_ap(True, "wlan0"), 120)
 run_server()

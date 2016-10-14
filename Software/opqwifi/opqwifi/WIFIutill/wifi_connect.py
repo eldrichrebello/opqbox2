@@ -97,10 +97,10 @@ def wifi_connect(ssid, iface="wlan0"):
             state = active_props.Get("org.freedesktop.NetworkManager.Connection.Active", "State")
             if state == 2:  # NM_ACTIVE_CONNECTION_STATE_ACTIVATED
                 print "Connected to access point"
-                return False
+                return True
         except Exception as e:
             pass
         time.sleep(1)
-    return True
+    return False
 
 
