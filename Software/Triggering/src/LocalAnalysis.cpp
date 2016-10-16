@@ -58,7 +58,7 @@ void LocalAnalysis::loop(bool &running) {
         float next = 0;
         for (size_t i = 0; i < _downSampled.size(); i++) {
             if (last != FP_NAN) {
-                if (last < 0 && _downSampled[i] > 0) {
+                if ((last <= 0 && _downSampled[i] > 0) || (last < 0 && _downSampled[i] >= 0)) {
                     next = _downSampled[i];
                     zeroCrossings.push_back(1.0f * i + (last) / (next - last));
                 }

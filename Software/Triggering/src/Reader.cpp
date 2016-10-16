@@ -20,6 +20,10 @@ using namespace opq::data;
 #include <math.h>
 #include <time.h>
 #include <stdlib.h>
+#else
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #endif
 
 Reader::Reader(MeasurementQueue &q){
