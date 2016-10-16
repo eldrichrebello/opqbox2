@@ -79,9 +79,12 @@ def wifi_ap(up=True, iface="wlan0"):
     device = dbus.Interface(proxy, "org.freedesktop.NetworkManager.Device")
     operation = "up" if up else "down"
     if operation == "up":
-        acpath = nm.ActivateConnection(connection_path, devpath, "/")
-        proxy = bus.get_object(service_name, acpath)
-        active_props = dbus.Interface(proxy, "org.freedesktop.DBus.Properties")
+        try:
+            acpath = nm.ActivateConnection(connection_path, devpath, "/")
+            proxy = bus.get_object(service_name, acpath)
+            active_props = dbus.Interface(proxy, "org.freedesktop.DBus.Properties")
+        except Exception as e:
+            return False
     else:
         try:
             device.Disconnect()

@@ -8,6 +8,7 @@ setup(name='opqwifi',
     author_email='sin8 at hawaii dot edu',
     url='https://github.com/openpowerquality/opqbox2',
     packages=find_packages(),
+    zip_safe=False,
     include_package_data=True,
     scripts=['opqwifi/opqwifi'],
     install_requires=[

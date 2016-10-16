@@ -8,7 +8,7 @@ from opqwifi.WIFIutill.wifi_ssids import wifi_ssids
 from opqwifi.WIFIutill.wifi_connect import wifi_connect
 from opqwifi.WIFIutill.wifi_check import wifi_check
 from opqwifi.WIFIutill.wifi_ap import wifi_ap
-
+from opqwifi.WIFIutill.wifi_wait import wifi_wait
 wifi_list = []
 
 @route('/js/<filename>')
@@ -39,20 +39,27 @@ def connect():
         password = request.forms.get('pwdWPA')
         mSSID = request.forms.get('fWPA')
         wifi_ap(False, "wlan0")
-        if not wifi_connect({"ssid" : mSSID, "Sec" : "WPA", "password" : password}):
-            wifi_ap(True, "wlan0")
+        wifi_connect({"ssid" : mSSID, "Sec" : "WPA", "password" : password})
 
     elif request.POST.get("sub_WEP","").strip():
         password = request.forms.get('pwdWEP')
         mSSID = request.forms.get('fWEP')
     redirect("/")
 
-def run_server(host='0.0.0.0', port=5001):
+def run_server(host='0.0.0.0', port=80):
     port = int(os.environ.get("PORT", port))
     run(host=host, port=port)
 
+def timer_func():
+    if not wifi_check():
+        print "No connection."
+        wifi_ap(True, "wlan0")
+    else:
+        print "Connection."
 
-time.sleep(10)
+wifi_wait()
+time.sleep(5)
 wifi_list = wifi_ssids()
-timer = threading.Timer(lambda  : (not wifi_check()) or wifi_ap(True, "wlan0"), 120)
+timer = threading.Timer(60, timer_func)
+timer.start()
 run_server()
