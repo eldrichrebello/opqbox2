@@ -1,0 +1,43 @@
+import logging
+import sys
+import signal
+import os
+from settings import Settings
+from zmqlistener import ZmqListener
+
+
+def handler(signum, frame):
+    logging.info("Caught SIGINT. Exiting")
+    os._exit(0)
+
+
+def main():
+    signal.signal(signal.SIGINT, handler)
+
+    settings_file = "/etc/opq/settings.set"
+    if len(sys.argv) < 2:
+        logging.info("No command line argument. Trying /etc/opq/settings.set")
+    else:
+        settings_file = sys.argv[1]
+
+    settings = Settings()
+    settings.loadFile(settings_file)
+
+    log_path = settings.getKey("log.acq_path")
+    if not log_path:
+        log_path = "acq.txt"
+    logging.basicConfig(filename=log_path, level=logging.INFO)
+    #Console logging
+    console = logging.StreamHandler()
+    console.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+    console.setFormatter(formatter)
+    logging.getLogger('').addHandler(console)
+
+    zmq = ZmqListener(settings)
+    zmq.run()
+
+if __name__ == "__main__":
+    main()
+
+

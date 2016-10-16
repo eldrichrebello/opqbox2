@@ -68,7 +68,7 @@ void HAL_MspInit(void)
   /* PendSV_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(PendSV_IRQn, 0, 0);
   /* SysTick_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(SysTick_IRQn, 2, 0);
 
   /* USER CODE BEGIN MspInit 1 */
 
@@ -100,7 +100,7 @@ void HAL_SDADC_MspInit(SDADC_HandleTypeDef* hsdadc)
   /* USER CODE BEGIN SDADC2_MspInit 1 */
     static TIM_OC_InitTypeDef tim_oc;
 
-    HAL_NVIC_SetPriority(SDADC2_IRQn, 0x01, 0);
+    HAL_NVIC_SetPriority(SDADC2_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(SDADC2_IRQn);
 
 
@@ -117,7 +117,7 @@ void HAL_SDADC_MspInit(SDADC_HandleTypeDef* hsdadc)
     tim_oc.OCMode = TIM_OCMODE_PWM1;
     tim_oc.Pulse = 3000;
     tim_oc.OCPolarity = TIM_OCPOLARITY_HIGH;
-    tim_oc.OCFastMode = TIM_OCFAST_DISABLE;
+    tim_oc.OCFastMode = TIM_OCFAST_ENABLE;
     HAL_TIM_PWM_ConfigChannel(&htim2, &tim_oc, TIM_CHANNEL_3);
 /* Peripheral interrupt init*/
 //    HAL_NVIC_SetPriority(TIM2_IRQn, 0, 0);
@@ -177,7 +177,7 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /* USER CODE BEGIN SPI3_MspInit 1 */
-    HAL_NVIC_SetPriority(SPI3_IRQn, 0, 1);
+    HAL_NVIC_SetPriority(SPI3_IRQn, 1, 0);
     HAL_NVIC_EnableIRQ(SPI3_IRQn);
   /* USER CODE END SPI3_MspInit 1 */
   }

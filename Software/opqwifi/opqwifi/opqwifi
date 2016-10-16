@@ -1,0 +1,58 @@
+#!/usr/bin/env python
+import os
+import time
+import threading
+
+from bottle import route, run, static_file, template, request, redirect, post
+from opqwifi.WIFIutill.wifi_ssids import wifi_ssids
+from opqwifi.WIFIutill.wifi_connect import wifi_connect
+from opqwifi.WIFIutill.wifi_check import wifi_check
+from opqwifi.WIFIutill.wifi_ap import wifi_ap
+
+wifi_list = []
+
+@route('/js/<filename>')
+def js_static(filename):
+    return static_file(filename, root=os.path.join(os.path.dirname(__file__), "../../opqwifi/js/"))
+
+
+@route('/img/<filename>')
+def img_static(filename):
+    return static_file(filename, root=os.path.join(os.path.dirname(__file__), "../../opqwifi/img/"))
+
+
+@route('/css/<filename>')
+def img_static(filename):
+    return static_file(filename, root=os.path.join(os.path.dirname(__file__), "../../opqwifi/css/"))
+
+@route("/")
+def networks():
+    return template(os.path.join(os.path.dirname(__file__), "../../opqwifi/views/networks.tpl"), ssids=wifi_list)
+
+@post("/")
+def connect():
+    if request.POST.get("sub_OPEN","").strip():
+        mSSID = request.forms.get('fOPEN')
+
+
+    elif request.POST.get("sub_WPA","").strip():
+        password = request.forms.get('pwdWPA')
+        mSSID = request.forms.get('fWPA')
+        wifi_ap(False, "wlan0")
+        if not wifi_connect({"ssid" : mSSID, "Sec" : "WPA", "password" : password}):
+            wifi_ap(True, "wlan0")
+
+    elif request.POST.get("sub_WEP","").strip():
+        password = request.forms.get('pwdWEP')
+        mSSID = request.forms.get('fWEP')
+    redirect("/")
+
+def run_server(host='0.0.0.0', port=5001):
+    port = int(os.environ.get("PORT", port))
+    run(host=host, port=port)
+
+
+time.sleep(10)
+wifi_list = wifi_ssids()
+timer = threading.Timer(lambda  : (not wifi_check()) or wifi_ap(True, "wlan0"), 120)
+run_server()
