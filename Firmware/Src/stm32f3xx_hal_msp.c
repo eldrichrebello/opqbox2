@@ -56,17 +56,17 @@ void HAL_MspInit(void)
 
   /* System interrupt init*/
   /* MemoryManagement_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(MemoryManagement_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(MemoryManagement_IRQn, 2, 0);
   /* BusFault_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(BusFault_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(BusFault_IRQn, 2, 0);
   /* UsageFault_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(UsageFault_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(UsageFault_IRQn, 2, 0);
   /* SVCall_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(SVCall_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(SVCall_IRQn, 2, 0);
   /* DebugMonitor_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DebugMonitor_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(DebugMonitor_IRQn, 2, 0);
   /* PendSV_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(PendSV_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(PendSV_IRQn, 2, 0);
   /* SysTick_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(SysTick_IRQn, 2, 0);
 
@@ -100,7 +100,7 @@ void HAL_SDADC_MspInit(SDADC_HandleTypeDef* hsdadc)
   /* USER CODE BEGIN SDADC2_MspInit 1 */
     static TIM_OC_InitTypeDef tim_oc;
 
-    HAL_NVIC_SetPriority(SDADC2_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(SDADC2_IRQn, 1, 0);
     HAL_NVIC_EnableIRQ(SDADC2_IRQn);
 
 
@@ -177,7 +177,7 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /* USER CODE BEGIN SPI3_MspInit 1 */
-    HAL_NVIC_SetPriority(SPI3_IRQn, 1, 0);
+    HAL_NVIC_SetPriority(SPI3_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(SPI3_IRQn);
   /* USER CODE END SPI3_MspInit 1 */
   }
@@ -200,7 +200,7 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef* hspi)
     PA2     ------> SPI3_MISO
     PA4     ------> SPI3_NSS
     PB5     ------> SPI3_MOSI 
-    */
+ /   */
     HAL_GPIO_DeInit(GPIOA, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3|GPIO_PIN_4);
 
 

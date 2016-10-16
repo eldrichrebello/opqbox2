@@ -23,10 +23,10 @@ SET(COMMON_FLAGS "-mthumb \
         -I${PROJECT_SOURCE_DIR}/Drivers/STM32F3xx_HAL_Driver/Inc/ \
         -I${PROJECT_SOURCE_DIR}/Inc/    \
         -I${PROJECT_SOURCE_DIR}/Drivers/CMSIS/Device/ST/STM32F3xx/Include/ \
-        -Wall -fno-common -fno-strict-aliasing")
+        -Wall -fno-common -fno-strict-aliasing -Os")
 
 SET(CMAKE_C_FLAGS ${COMMON_FLAGS})
-SET(CMAKE_C_LINK_FLAGS "-Wl,-gc-sections,-Map=opq.map,-cref,-T${PROJECT_SOURCE_DIR}/STM32F373CC_FLASH.ld -mthumb -mcpu=cortex-m4 -mfloat-abi=softfp -mfpu=fpv4-sp-d16")
+SET(CMAKE_C_LINK_FLAGS "-Wl,-gc-sections,-Map=opq.map,-cref,-T${PROJECT_SOURCE_DIR}/STM32F373CC_FLASH.ld -mthumb -mcpu=cortex-m4 -mfloat-abi=softfp -mfpu=fpv4-sp-d16 -Os")
 SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 
 set(SOURCE_FILES

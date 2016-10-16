@@ -26,7 +26,7 @@
 ///SPI
 #define OPQ_SPI_BUS 0
 #define OPQ_SPI_CHAN 0
-#define OPQ_SPI_MAX_SPEED 976000       //mhz ish
+#define OPQ_SPI_MAX_SPEED 1953000       //mhz ish
 #define OPQ_SPI_BITS_PER_WORD 8
 
 struct opq_frame_buffer {
