@@ -109,7 +109,7 @@ void HAL_SDADC_MspInit(SDADC_HandleTypeDef* hsdadc)
     htim2.Instance = TIM2;
     htim2.Init.ClockDivision = 0;
     htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-    htim2.Init.Period = 6000; /* Freq = 72Mhz/65535 = 1.098 KHz */
+    htim2.Init.Period = 6000 -1; /* Freq = 72Mhz/65535 = 1.098 KHz */
     htim2.Init.Prescaler = 0;
     HAL_TIM_PWM_Init(&htim2);
 
