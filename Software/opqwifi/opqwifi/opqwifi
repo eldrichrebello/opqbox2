@@ -50,16 +50,23 @@ def run_server(host='0.0.0.0', port=80):
     port = int(os.environ.get("PORT", port))
     run(host=host, port=port)
 
-def timer_func():
-    if not wifi_check():
-        print "No connection."
-        wifi_ap(True, "wlan0")
-    else:
-        print "Connection."
+class WifiChecker:
+    def __init__(self):
+        self.timer = threading.Timer(5, self.timer_func)
+        self.timer.start()
+    def timer_func(self):
+        if not wifi_check():
+            print "No connection."
+            wifi_ap(True, "wlan0")
+        else:
+            print "Connection."
+	self.timer = threading.Timer(5, self.timer_func)
+	self.timer.start()
 
+a = WifiChecker()
 wifi_wait()
 time.sleep(5)
 wifi_list = wifi_ssids()
-timer = threading.Timer(60, timer_func)
-timer.start()
+
+
 run_server()
