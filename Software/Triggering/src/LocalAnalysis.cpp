@@ -60,7 +60,7 @@ void LocalAnalysis::loop(bool &running) {
             if (last != FP_NAN) {
                 if ((last <= 0 && _downSampled[i] > 0) || (last < 0 && _downSampled[i] >= 0)) {
                     next = _downSampled[i];
-                    zeroCrossings.push_back(1.0f * i + (last) / (next - last));
+                    zeroCrossings.push_back(1.0f * i - (next) / (next - last));
                 }
             }
             last = _downSampled[i];

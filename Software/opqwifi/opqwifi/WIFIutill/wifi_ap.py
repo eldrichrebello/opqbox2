@@ -33,6 +33,7 @@ def wifi_ap(up=True, iface="wlan0"):
     s_con = dbus.Dictionary({
         'type': '802-11-wireless',
         'uuid': our_uuid,
+        'autoconnect': False,
         'id': 'OPQ'})
 
     s_wifi = dbus.Dictionary({
