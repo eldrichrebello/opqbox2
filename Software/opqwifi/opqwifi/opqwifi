@@ -3,7 +3,7 @@ import os
 import time
 import threading
 
-from bottle import Bottle, request, redirect
+from bottle import Bottle, request, redirect, template, static_file
 from opqwifi.WIFIutill.wifi_ssids import wifi_ssids
 from opqwifi.WIFIutill.wifi_connect import wifi_connect
 from opqwifi.WIFIutill.wifi_check import wifi_check

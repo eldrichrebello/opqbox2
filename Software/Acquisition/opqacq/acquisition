@@ -1,9 +1,10 @@
+#!/usr/bin/python
 import logging
 import sys
 import signal
 import os
-from settings import Settings
-from zmqlistener import ZmqListener
+from opqacq.settings import Settings
+from opqacq.zmqlistener import ZmqListener
 
 
 def handler(signum, frame):
