@@ -3,6 +3,8 @@ TRIGGERING_BUILD_DIR="./Triggering/build/"
 TRIGGERING_DOCS_DIR="./docs/Triggering"
 FIRMWARE_DIR="../Firmware"
 FIRMWARE_DOCS_DIR="./docs/Firmware"
+DSPutill_DIR="./DSPutill/"
+WIFI_DIR="./opqwifi/"
 SRC_DIR=$(pwd)
 
 #Building kernel files
@@ -36,7 +38,7 @@ if [ ! -d ${TRIGGERING_DOCS_DIR} ]; then
 fi
 
 cd ${TRIGGERING_DOCS_DIR}
-	echo Creating Doxygen Config file
+	echo Creating Doxygen Config file for Triggering
 	doxygen -s -g
 	echo Editing Project Name, Input Source, and Disabling Latex Output
 	sed -i 's;PROJECT_NAME           = "My Project";PROJECT_NAME           = "Triggering";' Doxyfile
@@ -62,7 +64,7 @@ if [ ! -d ${FIRMWARE_DOCS_DIR} ]; then
 fi
 
 cd ${FIRMWARE_DOCS_DIR}
-	echo Creating Doxygen Config file
+	echo Creating Doxygen Config file for Firmware
 	doxygen -s -g
 	echo Editing Project Name, Input Source, and Disabling Latex Output
 	sed -i 's;PROJECT_NAME           = "My Project";PROJECT_NAME           = "Firmware";' Doxyfile
@@ -70,4 +72,15 @@ cd ${FIRMWARE_DOCS_DIR}
 	sed -i 's;GENERATE_LATEX         = YES;GENERATE_LATEX         = NO;' Doxyfile
 	echo Generating Documentation for Firmware in ${FIRMWARE_DOCS_DIR}
 	doxygen Doxyfile >> /dev/null
+cd ${SRC_DIR}
+
+#Installs DSPutill
+cd ${DSPutill_DIR}
+	echo Installing DSPutill
+	sudo python setup.py install
+cd ${SRC_DIR}
+#Installs WIFIutill
+cd ${WIFI_DIR}
+	echo Installing WIFIutill
+	sudo python setup.py install
 cd ${SRC_DIR}
