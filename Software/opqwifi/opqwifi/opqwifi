@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import os
 import time
-import threading
 
 from bottle import Bottle, request, redirect, template, static_file
 from opqwifi.WIFIutill.wifi_ssids import wifi_ssids
@@ -13,14 +12,12 @@ from opqwifi.WIFIutill.wifi_wait import wifi_wait
 class opqwifi:
     def __init__(self):
         self.wifi_list = []
-        self.timer = threading.Timer(5, self.timer_func)
         self.app = Bottle()
         self.app.route('/js/<filename>', callback=self.js_static)
         self.app.route('/img/<filename>', callback=self.img_static)
         self.app.route('/css/<filename>', callback=self.css_static)
         self.app.route('/', method="GET", callback=self.networks)
         self.app.route('/', method="POST", callback=self.connect)
-
 
     def js_static(self, filename):
         return static_file(filename, root=os.path.join(os.path.dirname(__file__), "../../opqwifi/js/"))
@@ -34,7 +31,7 @@ class opqwifi:
         return static_file(filename, root=os.path.join(os.path.dirname(__file__), "../../opqwifi/css/"))
 
     def networks(self):
-        return template(os.path.join(os.path.dirname(__file__), "../../opqwifi/views/networks.tpl"), ssids=wifi_list)
+        return template(os.path.join(os.path.dirname(__file__), "../../opqwifi/views/networks.tpl"), ssids=self.wifi_list)
 
     def connect(self):
         if request.POST.get("sub_OPEN","").strip():
@@ -45,8 +42,8 @@ class opqwifi:
             password = request.forms.get('pwdWPA')
             mSSID = request.forms.get('fWPA')
             wifi_ap(False, "wlan0")
-            wifi_connect({"ssid" : mSSID, "Sec" : "WPA", "password" : password})
-            self.start_timer()
+            if not wifi_connect({"ssid" : mSSID, "Sec" : "WPA", "password" : password}):
+                wifi_ap(True, "wlan0")
 
         elif request.POST.get("sub_WEP","").strip():
             password = request.forms.get('pwdWEP')
@@ -55,23 +52,11 @@ class opqwifi:
 
     def run_server(self, host='0.0.0.0', port=80):
         wifi_wait()
+        time.sleep(5)
         self.wifi_list = wifi_ssids()
-        self.start_timer()
-        run(host=host, port=port)
-
-    def timer_func(self):
         if not wifi_check():
             wifi_ap(True, "wlan0")
-        else:
-            print "Connection."
-            self.start_timer()
-
-    def start_timer(self):
-        self.timer = threading.Timer(5, self.timer_func)
-        self.timer.start()
-
-
-
+        self.app.run(host=host, port=port)
 
 a = opqwifi()
 a.run_server()
