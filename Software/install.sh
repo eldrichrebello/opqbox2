@@ -24,4 +24,9 @@ cd ${SRC_DIR}
 
 #Create opquser
 echo Creating account opquser if it does not exist
-id -u opquser &>/dev/null || sudo useradd opquser
+if id -u opquser 2>/dev/null; then 
+    sudo useradd opquser
+else
+    echo "User already exists"
+fi
+
