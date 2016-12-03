@@ -2,13 +2,7 @@
 export module="opq_chardev"
 export device="opq"
 export mode="777"
-
-# Group: since distributions do it differently, look for wheel or use staff
-if grep -q '^staff:' /etc/group; then
-    group="pi"
-else
-    group="pi"
-fi
+export group="opquser"
 
 # invoke insmod with all arguments we got
 # and use a pathname, as insmod doesn't look in . by default

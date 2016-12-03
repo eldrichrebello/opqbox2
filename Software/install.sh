@@ -30,6 +30,13 @@ else
     echo "User already exists"
 fi
 
+#Creating a logging directory
 echo Creating logging directories
 mkdir -p /var/log/opq
 chown opquser /var/log/opq
+
+#Configure the init scripts
+cp opq_services /etc/init.d/
+chmod +x /etc/init.d/opq_services
+update-rc.d opq_services defaults
+update-rc.d opq_services enable
