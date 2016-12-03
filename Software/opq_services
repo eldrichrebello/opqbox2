@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 ### BEGIN INIT INFO
 # Provides:          opqbox_services
 # Required-Start:    $remote_fs $network $time $syslog
@@ -45,6 +45,24 @@ do_start()
 {
 	log_daemon_msg "Starting ${NAME}..."
 	#Starts opqwifi as root, if not already running
+    echo "Starting wifi daemon"
+    /bin/rm -f /etc/NetworkManager/system-connections/OPQ
+    /usr/bin/nmcli connection reload
+    /usr/bin/nmcli device disconnect wlan0
+
+    while ! /usr/bin/nmcli dev wifi rescan 2> /dev/null; do
+        sleep 1
+    done
+
+    while ! /usr/bin/nmcli dev wifi rescan 2> /dev/null; do
+        sleep 1
+    done
+    echo "Network Manager Scan complete"
+
+    echo "Attempting to connect to a configured network"
+    if ! sudo nmcli device connect wlan0 2> /dev/null; then
+        echo "Could not connect to a configured network"
+    fi
 	start-stop-daemon --start --quiet --background --pidfile ${WIFI_PIDFILE} --make-pidfile --user root --chuid root --startas ${WIFI_SERVICE}
 	#Starts acquisition and triggering as opquser, if not already running
 	start-stop-daemon --start --quiet --background --pidfile ${ACQUISITION_PIDFILE} --make-pidfile --user ${USER} --chuid ${USER} --startas ${ACQUISITION_SERVICE}

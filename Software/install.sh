@@ -30,3 +30,6 @@ else
     echo "User already exists"
 fi
 
+echo Creating logging directories
+mkdir -p /var/log/opq
+chown opquser /var/log/opq
