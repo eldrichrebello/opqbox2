@@ -18,6 +18,7 @@ void HAL_SDADC_InjectedConvCpltCallback(SDADC_HandleTypeDef *hsdadc) {
     if (frameBuffer.currentSample >= 200) {
         frameBuffer.frames[frameBuffer.head].last_gps_counter = frameBuffer.gps_last_counter;
         frameBuffer.frames[frameBuffer.head].current_counter  = __HAL_TIM_GetCounter(&htim4);
+        frameBuffer.frames[frameBuffer.head].flags = 0;
         if(frameBuffer.gps_pulse_flag){
             frameBuffer.gps_pulse_flag = 0;
             frameBuffer.frames[frameBuffer.head].flags = OPQ_GPS_THIS_FRAME;
