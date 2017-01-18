@@ -6,11 +6,15 @@ SDADC_HandleTypeDef hsdadc2;
 //SPI handle
 SPI_HandleTypeDef hspi3;
 
-//Timer handle
+//Timer handle adc
 TIM_HandleTypeDef htim2;
+
+//Timer handle gps
+TIM_HandleTypeDef htim4;
 
 //UART handle
 UART_HandleTypeDef huart1;
+
 
 void SystemClock_Config(void) {
 
@@ -216,4 +220,29 @@ void MX_GPIO_Init(void) {
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
+}
+
+void MX_GPS_Init(void){
+    htim4.Instance = TIM4;
+    /* Initialize TIMx peripheral as follows:
+         + Period = 0xFFFF
+         + Prescaler = 0
+         + ClockDivision = 0
+         + Counter direction = Up
+    */
+    htim4.Init.Period        = 60000 -1;
+    htim4.Init.Prescaler     = 1200 -1;
+    htim4.Init.ClockDivision = 0;
+    htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
+    HAL_TIM_IC_Init(&htim4);
+
+    //Timer input capture for GPS
+    TIM_IC_InitTypeDef     sICConfig;
+    sICConfig.ICPolarity  = TIM_ICPOLARITY_RISING;
+    sICConfig.ICSelection = TIM_ICSELECTION_DIRECTTI;
+    sICConfig.ICPrescaler = TIM_ICPSC_DIV1;
+    sICConfig.ICFilter    = 0;
+    HAL_TIM_IC_ConfigChannel(&htim4, &sICConfig, TIM_CHANNEL_1);
+
+    HAL_TIM_IC_Start_IT(&htim4, TIM_CHANNEL_1);
 }

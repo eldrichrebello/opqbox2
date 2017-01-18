@@ -11,10 +11,14 @@ typedef struct{
     ///Signed 16 bit data points
     int16_t data[FRAME_DATA_COUNT];
     //Reserved
-    int32_t zero_crossing_high;
+    uint16_t last_gps_counter;
+    uint16_t current_counter;
     //Reserved
-    int32_t zero_crossing_low;
+    uint32_t flags;
 } OPQ_Frame;
+
+//Flag value for
+#define OPQ_GPS_THIS_FRAME 1
 
 ///OPQ Frame Buffer. This is a persistent data structure for storing the data samples.
 typedef struct{
@@ -26,6 +30,11 @@ typedef struct{
     uint8_t tail;
     ///Current data sample in the frame.
     uint8_t currentSample;
+    //GPS Pulse flag set by the Interrupt
+    uint8_t gps_pulse_flag;
+    //GPS Counter Value set by
+    uint16_t gps_last_counter;
+
 } OPQ_Frame_Buffer;
 
 ///Circular frame buffer

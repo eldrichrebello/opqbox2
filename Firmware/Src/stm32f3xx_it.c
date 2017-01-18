@@ -39,6 +39,8 @@
 extern UART_HandleTypeDef huart1;
 extern SDADC_HandleTypeDef hsdadc2;
 extern SPI_HandleTypeDef hspi3;
+extern TIM_HandleTypeDef    htim4;
+
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
@@ -182,6 +184,11 @@ void SPI3_IRQHandler(void) {
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
     }
     HAL_SPI_IRQHandler(&hspi3);
+}
+
+
+void TIM4_IRQHandler(void) {
+    HAL_TIM_IRQHandler(&htim4);
 }
 
 /* USER CODE END 1 */

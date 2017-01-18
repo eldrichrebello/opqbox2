@@ -16,12 +16,27 @@ void HAL_SDADC_InjectedConvCpltCallback(SDADC_HandleTypeDef *hsdadc) {
     frameBuffer.frames[frameBuffer.head].data[frameBuffer.currentSample] = InjConvValue;
     frameBuffer.currentSample++;
     if (frameBuffer.currentSample >= 200) {
+        frameBuffer.frames[frameBuffer.head].last_gps_counter = frameBuffer.gps_last_counter;
+        frameBuffer.frames[frameBuffer.head].current_counter  = __HAL_TIM_GetCounter(&htim4);
+        if(frameBuffer.gps_pulse_flag){
+            frameBuffer.gps_pulse_flag = 0;
+            frameBuffer.frames[frameBuffer.head].flags = OPQ_GPS_THIS_FRAME;
+        }
         frameBuffer.currentSample = 0;
         frameBuffer.head++;
         if (frameBuffer.head >= FRAME_BUFFER_SIZE) {
             frameBuffer.head = 0;
         }
     }
+}
+
+/**
+ * @brief Callback for a GPS PPS
+ * @param htim
+ */
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
+    frameBuffer.gps_pulse_flag = 1;
+    frameBuffer.gps_last_counter = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
 }
 
 int main(void) {
@@ -37,6 +52,7 @@ int main(void) {
     MX_SPI3_Init();
     MX_USART1_UART_Init();
     MX_SDADC2_Init();
+    MX_GPS_Init();
 
     //Set up the runtime and globals
     init_OPQ_RunTime();

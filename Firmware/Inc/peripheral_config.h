@@ -8,8 +8,11 @@ extern SDADC_HandleTypeDef hsdadc2;
 //SPI handle
 extern SPI_HandleTypeDef hspi3;
 
-//Timer handle
+//Timer handle for ADC
 extern TIM_HandleTypeDef htim2;
+
+//Timer handle for GPS
+extern TIM_HandleTypeDef htim4;
 
 //UART handle
 extern UART_HandleTypeDef huart1;
@@ -44,5 +47,9 @@ void MX_SPI3_Init(void);
  */
 void MX_USART1_UART_Init(void);
 
+/**
+ * @brief Initialize GPS Capture timer.
+ */
+void MX_GPS_Init(void);
 
 #endif //OPQ_PERIPHERAL_CONFIG_H
