@@ -34,9 +34,13 @@ namespace opq {
 
         typedef struct OPQCycle{
             int16_t data[SAMPLES_PER_CYCLE];
-            int32_t zero_crossing_high;
-            int32_t zero_crossing_low;
+            uint16_t last_gps_counter;
+            uint16_t current_counter;
+            //Reserved
+            uint32_t flags;
         } __attribute__((packed)) OPQCycle;
+
+        static const __uint32_t OPQ_GPS_THIS_FRAME=1;
 
         inline bool readCycle(int fd, opq::data::OPQCycle &cycle){
 #ifdef OPQ_DEBUG
@@ -90,6 +94,9 @@ namespace opq {
             uint16_t hist[HISTOGRAM_BINS];
             ///UNIX timestamp of the first opqcycle rtransfer.
             std::chrono::time_point<std::chrono::high_resolution_clock> start;
+            uint16_t  last_gps_counter;
+            uint16_t current_counter;
+            uint32_t flags;
         } OPQAnalysis;
 
         ///@brief Smart pointer of OPQAnalysis.

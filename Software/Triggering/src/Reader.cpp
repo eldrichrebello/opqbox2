@@ -24,6 +24,8 @@ using namespace opq::data;
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <opqdata.hpp>
+
 #endif
 
 Reader::Reader(MeasurementQueue &q){
@@ -62,6 +64,7 @@ void Reader::loop(bool &running){
                 BOOST_LOG_TRIVIAL(fatal) << "Could not communicate with driver.";
                 exit(0);
             }
+            cout << measurement->cycles[current_frame].last_gps_counter << " " << measurement->cycles[current_frame].current_counter << " " << measurement->cycles[current_frame].flags << endl;
             measurement->timestamps.push_back(std::chrono::high_resolution_clock::now());
             current_frame++;
         }
