@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='opq.proto',
   package='opq.proto',
   syntax='proto2',
-  serialized_pb=_b('\n\topq.proto\x12\topq.proto\"#\n\x05\x43ycle\x12\x0c\n\x04time\x18\x01 \x02(\x04\x12\x0c\n\x04\x64\x61ta\x18\x02 \x03(\x05\"H\n\x0b\x44\x61taMessage\x12\n\n\x02id\x18\x01 \x02(\x05\x12\x0b\n\x03mid\x18\x02 \x01(\x05\x12 \n\x06\x63ycles\x18\x03 \x03(\x0b\x32\x10.opq.proto.Cycle\"]\n\x0eTriggerMessage\x12\n\n\x02id\x18\x01 \x02(\x05\x12\x0c\n\x04time\x18\x02 \x02(\x04\x12\x11\n\tfrequency\x18\x03 \x02(\x02\x12\x0b\n\x03rms\x18\x04 \x02(\x02\x12\x11\n\thistogram\x18\x05 \x03(\x05\"\xbf\x01\n\x12RequestDataMessage\x12\x37\n\x04type\x18\x01 \x02(\x0e\x32).opq.proto.RequestDataMessage.RequestType\x12\x0c\n\x04time\x18\x02 \x01(\x04\x12\x0c\n\x04\x62\x61\x63k\x18\x03 \x01(\x05\x12\x0f\n\x07\x66orward\x18\x04 \x01(\x05\x12\x0b\n\x03mid\x18\x05 \x02(\x05\"6\n\x0bRequestType\x12\x08\n\x04PING\x10\x01\x12\x08\n\x04PONG\x10\x02\x12\x08\n\x04READ\x10\x03\x12\t\n\x05\x45RROR\x10\x04')
+  serialized_pb=_b('\n\topq.proto\x12\topq.proto\"[\n\x05\x43ycle\x12\x0c\n\x04time\x18\x01 \x02(\x04\x12\x0c\n\x04\x64\x61ta\x18\x02 \x03(\x05\x12\x10\n\x08last_gps\x18\x03 \x01(\x05\x12\x15\n\rcurrent_count\x18\x04 \x01(\x05\x12\r\n\x05\x66lags\x18\x05 \x01(\x05\"H\n\x0b\x44\x61taMessage\x12\n\n\x02id\x18\x01 \x02(\x05\x12\x0b\n\x03mid\x18\x02 \x01(\x05\x12 \n\x06\x63ycles\x18\x03 \x03(\x0b\x32\x10.opq.proto.Cycle\"\x95\x01\n\x0eTriggerMessage\x12\n\n\x02id\x18\x01 \x02(\x05\x12\x0c\n\x04time\x18\x02 \x02(\x04\x12\x11\n\tfrequency\x18\x03 \x02(\x02\x12\x0b\n\x03rms\x18\x04 \x02(\x02\x12\x11\n\thistogram\x18\x05 \x03(\x05\x12\x10\n\x08last_gps\x18\x06 \x01(\x05\x12\x15\n\rcurrent_count\x18\x07 \x01(\x05\x12\r\n\x05\x66lags\x18\x08 \x01(\x05\"\xbf\x01\n\x12RequestDataMessage\x12\x37\n\x04type\x18\x01 \x02(\x0e\x32).opq.proto.RequestDataMessage.RequestType\x12\x0c\n\x04time\x18\x02 \x01(\x04\x12\x0c\n\x04\x62\x61\x63k\x18\x03 \x01(\x05\x12\x0f\n\x07\x66orward\x18\x04 \x01(\x05\x12\x0b\n\x03mid\x18\x05 \x02(\x05\"6\n\x0bRequestType\x12\x08\n\x04PING\x10\x01\x12\x08\n\x04PONG\x10\x02\x12\x08\n\x04READ\x10\x03\x12\t\n\x05\x45RROR\x10\x04')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -50,8 +50,8 @@ _REQUESTDATAMESSAGE_REQUESTTYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=368,
-  serialized_end=422,
+  serialized_start=481,
+  serialized_end=535,
 )
 _sym_db.RegisterEnumDescriptor(_REQUESTDATAMESSAGE_REQUESTTYPE)
 
@@ -77,6 +77,27 @@ _CYCLE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
+    _descriptor.FieldDescriptor(
+      name='last_gps', full_name='opq.proto.Cycle.last_gps', index=2,
+      number=3, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='current_count', full_name='opq.proto.Cycle.current_count', index=3,
+      number=4, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='flags', full_name='opq.proto.Cycle.flags', index=4,
+      number=5, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
@@ -90,7 +111,7 @@ _CYCLE = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=24,
-  serialized_end=59,
+  serialized_end=115,
 )
 
 
@@ -134,8 +155,8 @@ _DATAMESSAGE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=61,
-  serialized_end=133,
+  serialized_start=117,
+  serialized_end=189,
 )
 
 
@@ -181,6 +202,27 @@ _TRIGGERMESSAGE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
+    _descriptor.FieldDescriptor(
+      name='last_gps', full_name='opq.proto.TriggerMessage.last_gps', index=5,
+      number=6, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='current_count', full_name='opq.proto.TriggerMessage.current_count', index=6,
+      number=7, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='flags', full_name='opq.proto.TriggerMessage.flags', index=7,
+      number=8, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
@@ -193,8 +235,8 @@ _TRIGGERMESSAGE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=135,
-  serialized_end=228,
+  serialized_start=192,
+  serialized_end=341,
 )
 
 
@@ -253,8 +295,8 @@ _REQUESTDATAMESSAGE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=231,
-  serialized_end=422,
+  serialized_start=344,
+  serialized_end=535,
 )
 
 _DATAMESSAGE.fields_by_name['cycles'].message_type = _CYCLE

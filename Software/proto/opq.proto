@@ -5,6 +5,9 @@ package opq.proto;
 message Cycle{
 	required uint64 time = 1;
 	repeated int32 data = 2;
+	optional int32 last_gps = 3;
+	optional int32 current_count = 4;
+	optional int32 flags = 5;
 }
 
 message DataMessage{
@@ -19,6 +22,9 @@ message TriggerMessage{
 	required float frequency = 3;
 	required float rms = 4;
 	repeated int32 histogram = 5;
+	optional int32 last_gps = 6;
+	optional int32 current_count = 7;
+	optional int32 flags = 8;
 }
 
 message RequestDataMessage{

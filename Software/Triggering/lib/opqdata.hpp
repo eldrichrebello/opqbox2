@@ -47,6 +47,9 @@ namespace opq {
             for(int i = 0; i< data::SAMPLES_PER_CYCLE; i++) {
                 cycle.data[i] = 16384*sin(2*M_PI*i/SAMPLES_PER_CYCLE) + rand()%200 - 100;
             }
+            cycle.current_counter = 100;
+            cycle.last_gps_counter = 200;
+            cycle.flags = opq::data::OPQ_GPS_THIS_FRAME;
             std::this_thread::sleep_for(std::chrono::microseconds(1000000/60));
             return true;
 #else

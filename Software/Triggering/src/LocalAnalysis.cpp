@@ -77,8 +77,8 @@ void LocalAnalysis::loop(bool &running) {
                               accumulator;
 
         analysis->start = measurement->timestamps.front();
-        analysis->current_counter = measurement->cycles[0].current_counter;
-        analysis->last_gps_counter = measurement->cycles[0].last_gps_counter;
+        analysis->current_counter = measurement->cycles[measurement->cycles.size() - 1].current_counter;
+        analysis->last_gps_counter = measurement->cycles[measurement->cycles.size() - 1].last_gps_counter;
         analysis->flags = 0;
         for (auto &&frame : measurement->cycles) {
             analysis->flags |= frame.flags;
