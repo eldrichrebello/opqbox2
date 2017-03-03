@@ -18,8 +18,8 @@ RedisSerializer::RedisSerializer() {
     std::string redisHost = set->getString("redis.host");
     uint16_t redisPort = (uint16_t)set->getInt("redis.port");
     std::string redisPass = set->getString("redis.auth");
-    _redisRecordTTL = set->getInt("redis.ttl");
-    _redisRecordRotation = set->getInt("redis.rotation");
+    _redisRecordTtlS = set->getInt("redis.ttl.s");
+    _redisRecordGcCnt = set->getInt("redis.gc.cnt");
     _trimCnt = 0;
     c = NULL;
     BOOST_LOG_TRIVIAL(info) << "Connecting to redis " + redisHost + " port " + to_string(redisPort);
@@ -63,44 +63,17 @@ void RedisSerializer::sendToRedis(data::OPQMeasurementPtr measurement) {
     std::string message = util::serialize_to_protobuf(_boxId, measurement);
     if (measurement->timestamps.size() == 0) return;
 
-//    auto difference = std::chrono::duration_cast<std::chrono::seconds>(measurement->timestamps[0] - _lastRotation).count();
-//    bool setTTL = false;
-//    if(difference > _redisRecordRotation){
-//        _lastRotation = measurement->timestamps[0];
-//        setTTL = true;
-//        _key = std::to_string(util::crono_to_mili(measurement->timestamps[0]));
-//    }
-//    redisAppendCommand(c, "LPUSH %s %b",_key.c_str(), message.c_str(), message.length());
-//    if(setTTL){
-//        string ttlCmd = "EXPIRE " + _key + " " + std::to_string(_redisRecordTTL);
-//        redisAppendCommand(c, ttlCmd.c_str(), ttlCmd.length());
-//    }
-//    redisReply* reply;
-//    redisGetReply(c,(void**)&reply);
-//    if (reply == NULL || reply->type == REDIS_REPLY_ERROR) {
-//        BOOST_LOG_TRIVIAL(fatal) << "Lost connection with redis";
-//        exit(0);
-//    }
-//    freeReplyObject(reply);
-//    if(setTTL) {
-//        redisGetReply(c, (void **) &reply);
-//        if (reply == NULL || reply->type == REDIS_REPLY_ERROR) {
-//            BOOST_LOG_TRIVIAL(fatal) << "Lost connection with redis";
-//            exit(0);
-//        }
-//        freeReplyObject(reply);
-//    }
-
     uint64_t _ts = util::crono_to_mili(measurement->timestamps[0]);
-    _key = std::to_string(_ts);
+    _score = std::to_string(_ts);
 
     // Add to buffer
-    redisAppendCommand(c, "ZADD measurements_buffer %s %b", _key.c_str(), message.c_str(), message.length());
+    redisAppendCommand(c, "ZADD %s %s %b", BUFFER_KEY, _score.c_str(), message.c_str(), message.length());
 
+    // Perform GC
     uint64_t _endRange;
-    if(++_trimCnt >= 100) {
-        _endRange = _ts - (_redisRecordTTL * 1000);
-        redisAppendCommand(c, "ZREMRANGEBYSCORE measurements_buffer -inf %s", std::to_string(_endRange).c_str());
+    if(++_trimCnt == _redisRecordGcCnt) {
+        _endRange = _ts - (_redisRecordTtlS * MS_IN_S);
+        redisAppendCommand(c, "ZREMRANGEBYSCORE %s -inf %s", BUFFER_KEY, std::to_string(_endRange).c_str());
         _trimCnt = 0;
     }
 

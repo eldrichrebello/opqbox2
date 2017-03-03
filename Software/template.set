@@ -13,8 +13,9 @@ zmq.private_cert            :S  :/etc/opq/curve/private_keys/opqclient_secret
 redis.host                  :S  :127.0.0.1
 redis.port                  :I  :6379
 #redis.auth                  :S  :kalalau
-redis.ttl                   :I  :100
-redis.rotation              :I  :10
+redis.ttl.s                   :I  :30
+redis.gc.cnt			:I :20
+#redis.rotation              :I  :10
 #logging:
 log.trg_path                    :S  :/var/log/opq/trg.log
 log.acq_path                    :S  :/var/log/opq/acq.log
