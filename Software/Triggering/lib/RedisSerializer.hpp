@@ -33,6 +33,7 @@ namespace opq {
         std::chrono::time_point<std::chrono::high_resolution_clock > _lastRotation;
         std::string _key;
         int64_t _redisRecordTTL;
+        int32_t _trimCnt;
         int64_t _redisRecordRotation;
     };
     ///Overload the shift right operator for convenience.
