@@ -29,11 +29,11 @@ namespace opq {
         void sendToRedis(data::OPQMeasurementPtr measurement);
     private:
         const int MS_IN_S = 1000;
-        const char * BUFFER_KEY = "measurements_buffer";
         redisContext* c;
         int _boxId;
         std::chrono::time_point<std::chrono::high_resolution_clock > _lastRotation;
         std::string _score;
+        std::string _measurements_buffer;
         int64_t _redisRecordTtlS;
         int32_t _redisRecordGcCnt;
         int32_t _trimCnt;

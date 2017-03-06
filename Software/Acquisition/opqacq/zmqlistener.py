@@ -69,7 +69,7 @@ class ZmqListener:
                 self.log.info("Bad message from server")
                 self.client.send(message_buff)
                 return False
-            cycles = self.redis.getRange(message.time - message.back, message.time + message.front)
+            cycles = self.redis.get_range(message.time - message.back, message.time + message.front)
             cycles.id = self.id
             cycles.mid = message.mid
             message_buff = cycles.SerializeToString()

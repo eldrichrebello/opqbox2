@@ -2,6 +2,18 @@ import os
 import logging
 import redis
 import opq_pb2
+from itertools import chain
+
+def reserialize(serialized_measurements):
+    def get_cycles(measurement):
+        m = opq_pb2.DataMessage()
+        m.ParseFromString(measurement)
+        return m.cycles
+
+    cycles = list(chain.from_iterable(map(get_cycles, serialized_measurements)))
+    m = opq_pb2.DataMessage()
+    m.cycles.extend(cycles)
+    return m
 
 
 class RedisScraper:
@@ -10,6 +22,7 @@ class RedisScraper:
         redisHost = settings.getKey("redis.host")
         redisPort = settings.getKey("redis.port")
         redisAuth = settings.getKey("redis.auth")
+        self.redis_buffer_key = settings.getKey("redis.key.measurementsbuffer")
         if not redisHost or not redisPort:
             self.log.fatal("redis parameters not configured")
             os._exit(0)
@@ -26,29 +39,8 @@ class RedisScraper:
             os._exit(0)
         self.log.info("Connected to Redis")
 
-    def getRange(self, low, high):
-        key_strs = self.redis.keys()
-        keys = map(lambda x: int(x), key_strs)
-        keys = sorted(keys)
-        readout_keys = []
-        last_key = 0
-        for key in keys:
-            if low < key < high:
-                if len(readout_keys) == 0:
-                    readout_keys.append(last_key)
-                readout_keys.append(key)
-            elif key > high:
-                readout_keys.append(key)
-                break
-            last_key = key
+    def get_range(self, start_ts_ms, end_ts_ms):
+        measurements = self.redis.zrangebyscore(self.redis_buffer_key, start_ts_ms, end_ts_ms)
+        return reserialize(measurements)
 
-        message = opq_pb2.DataMessage()
-        i = 0
-        for key in readout_keys:
-            buffers = self.redis.lrange(key, 0, -1)
-            for buffer in buffers:
-                data = opq_pb2.DataMessage()
-                data.ParseFromString(buffer)
-                i += len(data.cycles)
-                message.cycles.extend(filter(lambda x: low < x.time < high, data.cycles))
-        return message
+

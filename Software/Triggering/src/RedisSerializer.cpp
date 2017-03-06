@@ -20,6 +20,7 @@ RedisSerializer::RedisSerializer() {
     std::string redisPass = set->getString("redis.auth");
     _redisRecordTtlS = set->getInt("redis.ttl.s");
     _redisRecordGcCnt = set->getInt("redis.gc.cnt");
+    _measurements_buffer = set->getString("redis.key.measurementsbuffer");
     _trimCnt = 0;
     c = NULL;
     BOOST_LOG_TRIVIAL(info) << "Connecting to redis " + redisHost + " port " + to_string(redisPort);
@@ -67,13 +68,13 @@ void RedisSerializer::sendToRedis(data::OPQMeasurementPtr measurement) {
     _score = std::to_string(_ts);
 
     // Add to buffer
-    redisAppendCommand(c, "ZADD %s %s %b", BUFFER_KEY, _score.c_str(), message.c_str(), message.length());
+    redisAppendCommand(c, "ZADD %s %s %b", _measurements_buffer.c_str(), _score.c_str(), message.c_str(), message.length());
 
     // Perform GC
     uint64_t _endRange;
     if(++_trimCnt == _redisRecordGcCnt) {
         _endRange = _ts - (_redisRecordTtlS * MS_IN_S);
-        redisAppendCommand(c, "ZREMRANGEBYSCORE %s -inf %s", BUFFER_KEY, std::to_string(_endRange).c_str());
+        redisAppendCommand(c, "ZREMRANGEBYSCORE %s -inf %s", _measurements_buffer.c_str(), std::to_string(_endRange).c_str());
         _trimCnt = 0;
     }
 
